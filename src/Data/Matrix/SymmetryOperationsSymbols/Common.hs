@@ -1,16 +1,16 @@
 module Data.Matrix.SymmetryOperationsSymbols.Common (
+  ErrorMessage,
   maybeToEither,
   rotPart,
   transPart,
   iw,
+  triplet,
+  tripletParen,
   adjustAnswerOnAxis,
   axisOf,
   senseOf,
-  isHex,
   locationOf,
   orientationOf,
-  triplet,
-  tripletParen,
   lookupMatrixW,
   lookupMatrixWHex,
   fromXYZ'',
@@ -23,17 +23,26 @@ import Data.Maybe
 import Data.Matrix.AsXYZ
 import Data.Ratio.Slash
 
+type ErrorMessage = String
+
+-- | borrowed from Base ?.?.?
 maybeToEither :: a -> Maybe b -> Either a b
 maybeToEither _ (Just b) = Right b
 maybeToEither a  Nothing = Left a
 
+-- |
+-- >>> triplet [1%2,3%4,5%6]
+-- "1/2,3/4,5/6"
 triplet :: [Ratio Integer] -> String
 triplet xs@[a,b,c] = intercalate "," . map (show . Slash) $ xs
 
+-- |
+-- >>> triplet [1%2,3%4,5%6]
+-- "(1/2,3/4,5/6)"
 tripletParen :: [Ratio Integer] -> String
 tripletParen = ("(" ++) . (++ ")") . triplet
 
--- (I-W)の計算
+-- | calculate (I-W)
 iw :: Num c => Matrix c -> Matrix c
 iw = elementwise (-) (identity 3) . rotPart
 
@@ -43,7 +52,7 @@ rotPart = submatrix 1 3 1 3
 transPart :: Matrix a -> Matrix a
 transPart = submatrix 1 3 4 4
 
--- 解を解直線上で補正
+-- | 解を解直線上で補正
 adjustAnswerOnAxis :: (Eq b, Fractional b, Integral a) =>  Matrix (Ratio a) -> [b] -> Maybe [b]
 adjustAnswerOnAxis mat ans = do
   let basis = axisOf mat
@@ -84,9 +93,6 @@ rate ans basis
 axisOf :: (Integral a,Num b) => Matrix (Ratio a) -> [b]
 axisOf mat = fromJust $ fmap fromIntegral . axis <$> searchMapData mat
 
-isHex :: (Integral a) => Matrix (Ratio a) -> Bool
-isHex mat = fromJust $ hex <$> searchMapData mat
-
 senseOf :: (Integral a) => Matrix (Ratio a) -> String
 senseOf mat = fromJust $ sense <$> searchMapData mat
 
@@ -102,6 +108,7 @@ sense (_,_,s,_,_,_,_) = s
 location (_,_,_,o,_,_,_) = rotPart . fromXYZ'' $ o
 orientation (a,b,c,d,e,f,g) = fmap fromIntegral e
 
+-- | 入力文字列が空だった場合に、4x4の0行列を返すバージョン
 fromXYZ'' s = fromMaybe (zero 4 4) (fromXYZ' s)
 
 searchMapData m = lookup (rotPart m) d
