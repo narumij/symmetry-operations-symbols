@@ -46,9 +46,11 @@ tripletParen = ("(" ++) . (++ ")") . triplet
 iw :: Num c => Matrix c -> Matrix c
 iw = elementwise (-) (identity 3) . rotPart
 
+-- | 3x3 rotation part of matrix
 rotPart :: Matrix a -> Matrix a
 rotPart = submatrix 1 3 1 3
 
+-- | 3x1 translation part of matrix
 transPart :: Matrix a -> Matrix a
 transPart = submatrix 1 3 4 4
 
