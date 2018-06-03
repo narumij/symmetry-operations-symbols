@@ -7,7 +7,7 @@ import Data.Maybe
 import Data.List
 import Text.ParserCombinators.Parsec
 
-import TestData
+-- import TestData
 
 sign :: CharParser () Char
 sign = oneOf "-+"
@@ -208,10 +208,6 @@ geometricRepresentation = do
   optionSpaces
   eof
   return a
-
-lefts   :: [Either a b] -> [a]
-lefts x = [a | Left a <- x]
-tests = map snd testData
 
 parseSymmetryOperation' :: SourceName -> Either ParseError (String,String,String,String)
 parseSymmetryOperation' st = parse geometricRepresentation st st
