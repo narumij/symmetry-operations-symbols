@@ -9,7 +9,13 @@ import Data.Matrix.SymmetryOperationsSymbols.Solve
 import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
 
-nFoldRotationCase :: Matrix Rational -> Either String String
+-- | Case (ii) (a) W corresponds to a rotoinversion
+--
+-- [Reference]
+--
+-- W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
+-- listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
+nFoldRotationCase :: Matrix Rational -> Either ErrorMessage String
 nFoldRotationCase m = maybeToEither "?? (rotation)" $ arrange m <$> solvingEquation m
 
 arrange :: Matrix Rational -> [Rational] -> String

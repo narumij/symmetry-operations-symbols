@@ -23,12 +23,13 @@ import Data.Matrix.SymmetryOperationsSymbols.RotInversionCase
 import Data.Matrix.AsXYZ
 
 -- | 与えられた対称要素の行列から、対称操作の記号等を導出します。
--- input: 3x4又は4x4のMatrix Rational
 --
 -- >>> fromMatrix . fromXYZ $ " 1 "
 -- "x,y,z"
 --
-fromMatrix :: Matrix Rational -> String
+fromMatrix ::
+              Matrix Rational -- ^ 3x4 or 4x4 Matrix
+           -> String
 fromMatrix m = case fromMatrix' m of
   Left s -> error s
   Right s -> s
@@ -73,22 +74,30 @@ correpondToGlideOrReflection _   _  = False
 
 -- 11.2.2. Derivation of coordinate triplets from symbols for symmetry operations
 
--- | 対称操作の幾何的表現の文字列から、行列表現を導出します。（cubic, tetragonal, orthorhombic, monoclinic, triclinic or rhombohedral）
--- Table 11.2.2.1を参照しています。
--- 返値は3x4行列
+-- | 対称操作の幾何的表現の文字列から行列表現の導出
+--
+-- ( cubic, tetragonal, orthorhombic, monoclinic, triclinic or rhombohedral )
+--
+-- matrix W の照らし合わせに、Table 11.2.2.1を参照しています。
 --
 -- >>> prettyXYZ . toMatrixHex $ "-3+ 0,0,z; 0,0,0"
 -- "y,-x,-z"
 --
+toMatrix :: String -- ^ like " -1 0,0,0"
+         -> Maybe (Matrix Rational) -- ^ 3x4 Matrix
 toMatrix = toMatrix' False
 
--- | 対称操作の幾何的表現の文字列をパースし、seiz matrixに変換します。(hexagonal)
--- Table 11.2.2.2を参照しています。
--- 返値は3x4行列
+-- | 対称操作の幾何的表現の文字列から行列表現の導出
+--
+-- ( hexagonal )
+--
+-- matrix W の照らし合わせに、Table 11.2.2.2を参照しています。
 --
 -- >>> prettyXYZ . toMatrixHex $ "-3+ 0,0,z; 0,0,0"
 -- "y,y-x,-z"
 --
+toMatrixHex :: String -- ^ like " -1 0,0,0"
+         -> Maybe (Matrix Rational) -- ^ 3x4 Matrix
 toMatrixHex = toMatrix' True
 
 -- Table 11.2.2.1と、Table 11.2.2.2、二つのテーブルの参照をBoolで切り替えています。

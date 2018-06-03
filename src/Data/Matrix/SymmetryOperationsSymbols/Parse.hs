@@ -212,7 +212,9 @@ geometricRepresentation = do
 parseSymmetryOperation' :: SourceName -> Either ParseError (String,String,String,String)
 parseSymmetryOperation' st = parse geometricRepresentation st st
 
-parseSymmetryOperation :: String -> Maybe (String,String,String,String)
+-- | 幾何表現の文字列をパースし、要素に分解する
+parseSymmetryOperation :: String -- ^ geometric repesentation like '-1 0,0,0' 'm x,0,z'
+                       -> Maybe (String,String,String,String) -- ^ ( Symbol part, Sense part, Vector part, Matrix part )
 parseSymmetryOperation st = case parseSymmetryOperation' st of
   Left _ -> Nothing
   Right s -> Just s

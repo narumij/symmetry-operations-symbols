@@ -11,7 +11,14 @@ import Data.Matrix.SymmetryOperationsSymbols.Solve
 import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
 
-glideOrReflectionCase :: Matrix Rational -> Either String String
+
+-- | Case (ii) (c) W corresponds to a (glide) reflection
+--
+-- [Reference]
+--
+-- W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
+-- listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
+glideOrReflectionCase :: Matrix Rational -> Either ErrorMessage String
 glideOrReflectionCase m = maybeToEither "?? (glide or reflection)" $ arrange m <$> solvingEquation m
 
 arrange m ans
