@@ -33,7 +33,7 @@ triplet xs@[a,b,c] = intercalate "," . map (show . Slash) $ xs
 tripletParen :: [Ratio Integer] -> String
 tripletParen = ("(" ++) . (++ ")") . triplet
 
--- (I - W) の計算
+-- (I-W)の計算
 iw :: Num c => Matrix c -> Matrix c
 iw = elementwise (-) (identity 3) . rotPart
 
@@ -215,7 +215,7 @@ tbl = [
   ( True,  "m",  "",   "x,0,z", [ 1, 2, 0],  "x-y,-y,z", [ 1, 2, 0]),
   ( True,  "m",  "",   "0,y,z", [ 2, 1, 0],  "-x,y-x,z", [ 2, 1, 0])
   -- Notice
-  -- Hexagonal用のテーブルが、HexagonalのITで出現する対称操作全てをカヴァーしているわけでではないことに注意
+  -- Hexagonal用のテーブルが、HexagonalのITで出現する対称操作全てをカヴァーしているわけではないことに注意
   -- hexagonalでのlookup時には、hexagonal部分が優先となるよう、順番をいれかえている
   -- それ以外のケースでは除外している
   ]
