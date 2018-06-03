@@ -147,14 +147,26 @@ inversion = do
   optionSpaces
   return ( "-1", "", vec, "" )
 
-millerOrGlide :: CharParser () (String,String,String,String)
-millerOrGlide = do
+miller :: CharParser () (String,String,String,String)
+miller = do
   optionSpaces
-  sy <- oneOf "abcmndg"
+  sy <- oneOf "abcm"
+  optionSpaces
+  ori <- matrix
+  optionSpaces
+  return ( [sy], "", "", ori )
+
+glide :: CharParser () (String,String,String,String)
+glide = do
+  optionSpaces
+  sy <- oneOf "ndg"
   optionSpaces
   (vec,ori) <- element
   optionSpaces
   return ( [sy], "", vec, ori )
+
+millerOrGlide :: CharParser () (String,String,String,String)
+millerOrGlide = try miller <|> glide
 
 rotation :: CharParser () (String,String,String,String)
 rotation = do
@@ -181,14 +193,21 @@ invRotation = do
   optionSpaces
   return ( ['-',c], [se], vec, ori )
 
-geometricRepresentation :: CharParser () (String,String,String,String)
-geometricRepresentation
+geometricRepresentation' :: CharParser () (String,String,String,String)
+geometricRepresentation'
   = try identity
   <|> try transform
   <|> try inversion
   <|> try millerOrGlide
   <|> try rotation
   <|> invRotation
+
+geometricRepresentation :: CharParser () (String,String,String,String)
+geometricRepresentation = do
+  a <- geometricRepresentation'
+  optionSpaces
+  eof
+  return a
 
 lefts   :: [Either a b] -> [a]
 lefts x = [a | Left a <- x]

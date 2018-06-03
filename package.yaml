@@ -24,20 +24,10 @@ dependencies:
 - matrix
 - parsec
 - matrix-as-xyz
+- doctest
 
 library:
   source-dirs: src
-
-executables:
-  symmetry-operations-symbols-exe:
-    main:                Main.hs
-    source-dirs:         app
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - symmetry-operations-symbols
 
 tests:
   symmetry-operations-symbols-test:
@@ -49,3 +39,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - symmetry-operations-symbols
+    - hspec
+    - QuickCheck

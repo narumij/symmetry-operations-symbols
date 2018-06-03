@@ -14,6 +14,9 @@ module Data.Matrix.SymmetryOperationsSymbols.Common (
   lookupMatrixW,
   lookupMatrixWHex,
   fromXYZ'',
+
+  isPartOfHexTable,
+  isNotPartOfHexTable,
   ) where
 
 import Data.List
@@ -107,17 +110,25 @@ searchMapData m = lookup (rotPart m) d
   where
     d = map (\i@(a,b,c,d,e,f,g)->(rotPart . fromXYZ'' $ f,i)) tbl
 
-lookupMatrixW = lookup' (const True)
+lookupMatrixW = lookup' (filter (not . hex) tbl)
 
-lookupMatrixWHex = lookup' hex
+lookupMatrixWHex = lookup' $ filter hex tbl ++ filter (not . hex) tbl
 
-lookup' predicate a b c = lookup (a',b,rotPart . fromXYZ'' $ c) d
+lookup' tbl a b c = lookup (a',b,rotPart . fromXYZ'' $ c) d
   where
     a' | a `elem` ["a","b","c","d","n","g"] = "m"
        | a == "t" = "1"
        | otherwise = a
-    d = map f (filter predicate tbl)
+    d = map f tbl
     f (a,b,c,d,e,f,g) = ((b,c,rotPart . fromXYZ'' $ d),f)
+
+isPartOfHexTable m = any snd $ filter ((== rotPart m).fst) $ map f tbl
+  where
+    f (a,b,c,d,e,f,g) = ( rotPart . fromXYZ'' $ f, a)
+
+isNotPartOfHexTable m = not . all snd $ filter ((== rotPart m).fst) $ map f tbl
+  where
+    f (a,b,c,d,e,f,g) = ( rotPart . fromXYZ'' $ f, a)
 
 type IsHex = Bool -- hex flag
 type Symbol = String
@@ -211,6 +222,10 @@ tbl = [
   ( True,  "m",  "",   "x,x,z", [ 1,-1, 0],     "y,x,z", [ 1,-1, 0]),
   ( True,  "m",  "",   "x,0,z", [ 1, 2, 0],  "x-y,-y,z", [ 1, 2, 0]),
   ( True,  "m",  "",   "0,y,z", [ 2, 1, 0],  "-x,y-x,z", [ 2, 1, 0])
+  -- Notice
+  -- Hexagonal用のテーブルが、HexagonalのITで出現する対称操作全てをカヴァーあしているわけでではないことに注意
+  -- hexagonalでのlookup時には、hexagonal部分が優先となるよう、順番をいれかえている
+  -- それ以外のケースでは除外している
   ]
 
 {--
