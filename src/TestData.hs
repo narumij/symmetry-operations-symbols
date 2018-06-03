@@ -5,6 +5,8 @@ module TestData (
 
 -- Symmetry...hoge
 -- mapM_ (\a->putStrLn $ "  " ++ show a ++ ",") $ filter (isNotPartOfHexTable.fromXYZ.fst.snd) testData'
+-- mapM_ (\a->putStrLn $ "  " ++ show a ++ ",") $ sortBy (\a b->fst(fst a) `compare` fst (fst b))  $ filter (isNotPartOfHexTable.fromXYZ.fst.snd) testData'
+
 
 testData = map snd testData'
 

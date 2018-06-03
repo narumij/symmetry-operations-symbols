@@ -19,10 +19,8 @@ import Data.Matrix.SymmetryOperationsSymbols.GlideOrReflectionCase
 import Data.Matrix.SymmetryOperationsSymbols.RotationCase
 import Data.Matrix.SymmetryOperationsSymbols.RotInversionCase
 
--- for repl check
+-- for doctest
 import Data.Matrix.AsXYZ
-import TestData
--- mapM_ print $ filter (not.fst) $ map (\(a,b)->let s = fromMatrix (fromXYZ a) in (b==s,(a,b,s))) testData
 
 -- | 与えられた対称要素の行列から、対称操作の記号等を導出します。
 -- input: 3x4又は4x4のMatrix Rational
@@ -69,19 +67,24 @@ correpondToGlideOrReflection :: Trace -> Determinant -> Bool
 correpondToGlideOrReflection 1 (-1) = True -- m
 correpondToGlideOrReflection _   _  = False
 
--- for repl check
--- mapM_ print $ filter (uncurry (/=).(\(a,b)->(fromXYZ . fst $ a,fromXYZ . fromJust $ b))) $ map (\a->(a,prettyXYZ <$> (toMatrix.snd) a)) $ testData
-
 -- 11.2.2. Derivation of coordinate triplets from symbols for symmetry operations
 
 -- | 対称操作の幾何的表現の文字列から、行列表現を導出します。（cubic, tetragonal, orthorhombic, monoclinic, triclinic or rhombohedral）
 -- Table 11.2.2.1を参照しています。
 -- 返値は3x4行列
+--
+-- >>> prettyXYZ . toMatrixHex $ "-3+ 0,0,z; 0,0,0"
+-- "y,-x,-z"
+--
 toMatrix = toMatrix' False
 
 -- | 対称操作の幾何的表現の文字列をパースし、seiz matrixに変換します。(hexagonal)
 -- Table 11.2.2.2を参照しています。
 -- 返値は3x4行列
+--
+-- >>> prettyXYZ . toMatrixHex $ "-3+ 0,0,z; 0,0,0"
+-- "y,y-x,-z"
+--
 toMatrixHex = toMatrix' True
 
 -- Table 11.2.2.1と、Table 11.2.2.2、二つのテーブルの参照をBoolで切り替えています。

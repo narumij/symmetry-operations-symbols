@@ -4,6 +4,8 @@ module TestDataHex (
 
 testDataHex = map snd testDataHex'
 
+-- TODO: データに間違いがないか、手作業で確認する
+
 testDataHex' = [
   ((146,1),("x,y,z"," 1  ")),
   ((146,1),("-y,x-y,z"," 3+ 0,0,z")),
