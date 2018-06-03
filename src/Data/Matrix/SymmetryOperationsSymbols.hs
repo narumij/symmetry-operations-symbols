@@ -24,6 +24,10 @@ import Data.Matrix.AsXYZ
 
 -- | 与えられた対称要素の行列から、対称操作の記号等を導出します。
 -- input: 3x4又は4x4のMatrix Rational
+--
+-- >>> fromMatrix . fromXYZ $ " 1 "
+-- "x,y,z"
+--
 fromMatrix :: Matrix Rational -> String
 fromMatrix m = case fromMatrix' m of
   Left s -> error s
