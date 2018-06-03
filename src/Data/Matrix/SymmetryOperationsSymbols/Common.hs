@@ -33,6 +33,7 @@ triplet xs@[a,b,c] = intercalate "," . map (show . Slash) $ xs
 tripletParen :: [Ratio Integer] -> String
 tripletParen = ("(" ++) . (++ ")") . triplet
 
+-- (I - W) の計算
 iw :: Num c => Matrix c -> Matrix c
 iw = elementwise (-) (identity 3) . rotPart
 
@@ -205,6 +206,8 @@ tbl = [
   ( True, "-6", "-",   "0,0,z", [ 0, 0, 1], "-y,x-y,-z", [ 0, 0, 1]),
   ( True,  "m",  "",  "x,-x,z", [ 1, 1, 0],   "-y,-x,z", [ 1, 1, 0]),
 -- 以下二つが、Orientationを利用して解の補正をすることができなかったため、代替値を用意している
+-- 行列を解いた場合の解平面とorientationが一致していない可能性（2017の試行錯誤)
+-- そもそも勘違いの可能性もまだあるので、のちのち再確認する。
   ( True,  "m",  "",  "x,2x,z", [ 1, 0, 0],   "y-x,y,z", [ 2,-1, 0]),
   ( True,  "m",  "",  "2x,x,z", [ 0, 1, 0],   "x,x-y,z", [-1, 2, 0]),
 
@@ -212,7 +215,7 @@ tbl = [
   ( True,  "m",  "",   "x,0,z", [ 1, 2, 0],  "x-y,-y,z", [ 1, 2, 0]),
   ( True,  "m",  "",   "0,y,z", [ 2, 1, 0],  "-x,y-x,z", [ 2, 1, 0])
   -- Notice
-  -- Hexagonal用のテーブルが、HexagonalのITで出現する対称操作全てをカヴァーあしているわけでではないことに注意
+  -- Hexagonal用のテーブルが、HexagonalのITで出現する対称操作全てをカヴァーしているわけでではないことに注意
   -- hexagonalでのlookup時には、hexagonal部分が優先となるよう、順番をいれかえている
   -- それ以外のケースでは除外している
   ]
