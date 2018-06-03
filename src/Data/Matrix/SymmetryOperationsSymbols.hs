@@ -1,3 +1,18 @@
+{-|
+Module      : SymmetryOperationsSymbols
+Copyright   : (c) Jun Narumi, 2018
+License     : BSD-3
+Maintainer  : narumij@gmail.com
+Stability   : experimental
+Portability : ?
+
+[Reference]
+
+W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
+
+listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
+
+-}
 module Data.Matrix.SymmetryOperationsSymbols (
   fromMatrix,
   toMatrix,
@@ -138,16 +153,3 @@ calc symbol vector orientation transCoords
     modulo1 n = mod' n 1
     -- ベクトル表記から3x1行列を生成する
     fromVec = transPart . fromXYZ''
-
-{--
-
-[Reference]
-
-W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
-listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
-
-TH. HAHN. (2006), Printed symbols for symmetry elements
-listed in International Tables for Crystallography (2006). Vol. A, Chapter 1.3, pp. 5–6.
-
-
---}

@@ -1,3 +1,13 @@
+{-|
+Module      : Solve
+Description : solving linear equation part
+Copyright   : (c) Jun Narumi, 2018
+License     : BSD-3
+Maintainer  : narumij@gmail.com
+Stability   : experimental
+Portability : ?
+
+-}
 module Data.Matrix.SymmetryOperationsSymbols.Solve (
   solve,
   ) where

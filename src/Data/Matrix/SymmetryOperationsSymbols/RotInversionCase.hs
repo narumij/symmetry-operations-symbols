@@ -1,3 +1,18 @@
+{-|
+Module      : RotInversionCase
+Copyright   : (c) Jun Narumi, 2018
+License     : BSD-3
+Maintainer  : narumij@gmail.com
+Stability   : experimental
+Portability : ?
+
+[Reference]
+
+W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
+
+listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
+
+-}
 module Data.Matrix.SymmetryOperationsSymbols.RotInversionCase (
   rotInversionCase,
   ) where
@@ -11,11 +26,6 @@ import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
 
 -- | Case (ii) (b) W corresponds to an n-fold rotation
---
--- [Reference]
---
--- W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
--- listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
 rotInversionCase :: Matrix Rational -> Either ErrorMessage String
 rotInversionCase m = maybeToEither "?? (rot inversion)" $ arrange m <$> calc m
 

@@ -1,3 +1,18 @@
+{-|
+Module      : GlideOrReflectionCase
+Copyright   : (c) Jun Narumi, 2018
+License     : BSD-3
+Maintainer  : narumij@gmail.com
+Stability   : experimental
+Portability : ?
+
+[Reference]
+
+W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
+
+listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
+
+-}
 module Data.Matrix.SymmetryOperationsSymbols.GlideOrReflectionCase (
   glideOrReflectionCase
   ) where
