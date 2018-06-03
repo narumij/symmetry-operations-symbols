@@ -14,9 +14,6 @@ module Data.Matrix.SymmetryOperationsSymbols.Common (
   lookupMatrixW,
   lookupMatrixWHex,
   fromXYZ'',
-
-  isPartOfHexTable,
-  isNotPartOfHexTable,
   ) where
 
 import Data.List
@@ -121,14 +118,6 @@ lookup' tbl a b c = lookup (a',b,rotPart . fromXYZ'' $ c) d
        | otherwise = a
     d = map f tbl
     f (a,b,c,d,e,f,g) = ((b,c,rotPart . fromXYZ'' $ d),f)
-
-isPartOfHexTable m = any snd $ filter ((== rotPart m).fst) $ map f tbl
-  where
-    f (a,b,c,d,e,f,g) = ( rotPart . fromXYZ'' $ f, a)
-
-isNotPartOfHexTable m = not . all snd $ filter ((== rotPart m).fst) $ map f tbl
-  where
-    f (a,b,c,d,e,f,g) = ( rotPart . fromXYZ'' $ f, a)
 
 type IsHex = Bool -- hex flag
 type Symbol = String
