@@ -6,7 +6,7 @@ Maintainer  : narumij@gmail.com
 Stability   : experimental
 Portability : ?
 
-[Reference]
+[References]
 
 W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
 
@@ -24,21 +24,31 @@ import Data.Matrix
 import Data.Matrix.SymmetryOperationsSymbols.Solve
 import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
+import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
 
 -- | Case (ii) (b) W corresponds to an n-fold rotation
-rotInversionCase :: Matrix Rational -> Either ErrorMessage String
-rotInversionCase m = maybeToEither "?? (rot inversion)" $ arrange m <$> calc m
+rotInversionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+rotInversionCase m = arrange m <$> calc m
 
+calc :: (Monad m, Integral a) => Matrix (Ratio a) -> m ([Ratio a], Matrix (Ratio a))    
 calc m = (,) <$> solvingEquation2 m <*> solvingEquation1 m
 
-arrange m (a,b) = unwords $ [symbol] ++ loc' ++ [triplet b]
+arrange :: Integral a => Matrix (Ratio a) -> ([Ratio a], Matrix (Ratio a)) -> SymmetryOperation a
+arrange m ([],b) = Inversion { centre = (i,j,k) }
   where
+    [i,j,k] = toList b
+arrange m (a,b) = RotInversion { nFold = n, sense = sen, axis = loc, point = (i,j,k) }
+  where
+    [i,j,k] = toList b
     rt = rotationType m
-    symbol | rt == -1 = "-1 "
-           | otherwise = show (rotationType m) ++ senseOf m
-    loc' | null a = []
-         | otherwise = [prettyXYZ loc ++ ";"]
     loc = locationOf m <|> fromList 3 1 a
+    n | rt == -3 = ThreeFold
+      | rt == -4 = FourFold
+      | rt == -6 = SixFold
+    sen = case senseOf m of
+      "+" -> Positive
+      "-" -> Negative
+      _ -> error ""
 
 ------------
 
@@ -64,20 +74,30 @@ wl :: (Fractional b, Eq b) => Matrix b -> Matrix b
 wl mat = elementwise (+) (wg mat) (transPart mat)
 
 -- (ii) (a) solving equation (W,w)x = x
-solvingEquation1 :: Integral a => Matrix (Ratio a) -> Maybe [Ratio a]
-solvingEquation1 mat = solve (iw mat) (toList . transPart $ mat)
+solvingEquation1 :: (Monad m, Integral a) => Matrix (Ratio a) -> m (Matrix (Ratio a))
+solvingEquation1 mat = case solvingEquation1' mat of
+  Nothing -> fail "<RotInv> when calculate equation (W,w)x = x"
+  Just a -> return a
+
+solvingEquation1' :: Integral a => Matrix (Ratio a) -> Maybe (Matrix (Ratio a))
+solvingEquation1' mat = solve (iw mat) (transPart mat)
 
 -- (ii) (a) solving equation (W,w)^2 x = x
-solvingEquation2' :: Integral a => Matrix (Ratio a) -> Maybe [Ratio a]
-solvingEquation2' mat = solve (iw w2) (toList . wl $ mat)
+solvingEquation2' :: Integral a => Matrix (Ratio a) -> Maybe (Matrix (Ratio a))
+solvingEquation2' mat = solve (iw w2) (wl mat)
   where
     pow2 m = multStd m m
     w2 = pow2 (rotPart mat)
 
-solvingEquation2 :: Integral a => Matrix (Ratio a) -> Maybe [Ratio a]
-solvingEquation2 mat = do
-  sol <- solvingEquation2' mat
-  adjustAnswerOnAxis mat sol
+solvingEquation2 :: (Monad m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+solvingEquation2 mat = case result of
+    Nothing -> fail "<RotInv> when calculate equation (W,w)^2 x = x."
+    Just a -> return a
+  where
+    result = do
+      sol <- solvingEquation2' mat
+      adjustAnswerOnAxis mat (toList sol)
+
 
 -- 検算。repl用
 check mat sol = if multStd (iw2 mat) (vec sol) == wl mat
@@ -87,11 +107,3 @@ check mat sol = if multStd (iw2 mat) (vec sol) == wl mat
       vec l = fromList (length l) 1 l
       iw2 m = iw $ multStd _W _W
       _W = rotPart mat
-
-{--
-
-[Reference]
-W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
-listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
-
---}

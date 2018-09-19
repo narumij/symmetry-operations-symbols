@@ -32,10 +32,18 @@ backsub ys zs xs = xs ++ [g]
 backward :: (Fractional a, Eq a) => Matrix a -> [a] -> [a]
 backward upper y = (foldl1 (.) $ map (backsub y) $ toLists upper) []
 
-solve :: (Integral a) => Matrix (Ratio a) -> [Ratio a] -> Maybe [Ratio a]
-solve mat vec = do
+solve' :: (Integral a) =>
+          Matrix (Ratio a)
+       -> [Ratio a]
+       -> Maybe [Ratio a]
+solve' mat vec = do
       (u,l,p,q,_,_) <- luDecomp' mat
       return $ permutation q . reverse . backward u . forward l . permutation p $ vec
   where
-    permutation :: Num a => Matrix a -> [a] -> [a]
     permutation n v = toList (multStd n (fromList (length v) 1 v))
+
+solve :: (Integral a) =>
+         Matrix (Ratio a) -- ^ 正方行列
+      -> Matrix (Ratio a) -- ^ ベクトル
+      -> Maybe (Matrix (Ratio a))
+solve mat vec = fromList (nrows vec) (ncols vec) <$> solve' mat (toList vec)

@@ -7,10 +7,17 @@ Maintainer  : narumij@gmail.com
 Stability   : experimental
 Portability : ?
 
+[Reference]
+
+W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
+
+listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
+
 -}
 module Data.Matrix.SymmetryOperationsSymbols.Common (
   ErrorMessage,
-  maybeToEither,
+  SymbolSenseVectorOrientation,
+  -- maybeToEither,
   rotPart,
   transPart,
   iw,
@@ -21,8 +28,8 @@ module Data.Matrix.SymmetryOperationsSymbols.Common (
   senseOf,
   locationOf,
   orientationOf,
-  lookupMatrixW,
-  lookupMatrixWHex,
+  properMatrixW,
+  hexagonalMatrixW,
   fromXYZ'',
   ) where
 
@@ -34,6 +41,7 @@ import Data.Matrix.AsXYZ
 import Data.Ratio.Slash
 
 type ErrorMessage = String
+type SymbolSenseVectorOrientation = (String,String,String,String)
 
 -- | borrowed from Base ?.?.?
 maybeToEither :: a -> Maybe b -> Either a b
@@ -41,15 +49,15 @@ maybeToEither _ (Just b) = Right b
 maybeToEither a  Nothing = Left a
 
 -- |
--- >>> triplet [1%2,3%4,5%6]
+-- >>> triplet (1%2,3%4,5%6)
 -- "1/2,3/4,5/6"
-triplet :: [Ratio Integer] -> String
-triplet xs@[a,b,c] = intercalate "," . map (show . Slash) $ xs
+triplet :: Integral a => (Ratio a,Ratio a,Ratio a) -> String
+triplet (a,b,c) = intercalate "," . map (show . Slash) $ [a,b,c]
 
 -- |
--- >>> triplet [1%2,3%4,5%6]
+-- >>> triplet (1%2,3%4,5%6)
 -- "(1/2,3/4,5/6)"
-tripletParen :: [Ratio Integer] -> String
+tripletParen :: Integral a => (Ratio a,Ratio a,Ratio a) -> String
 tripletParen = ("(" ++) . (++ ")") . triplet
 
 -- | calculate (I-W)
@@ -120,22 +128,35 @@ sense (_,_,s,_,_,_,_) = s
 location (_,_,_,o,_,_,_) = rotPart . fromXYZ'' $ o
 orientation (a,b,c,d,e,f,g) = fmap fromIntegral e
 
--- | 入力文字列が空だった場合に、4x4の0行列を返すバージョン
+-- | 入力文字列が空だった場合に、4x4の0行列を返す
 fromXYZ'' s = fromMaybe (zero 4 4) (fromXYZ' s)
 
 searchMapData m = lookup (rotPart m) d
   where
     d = map (\i@(a,b,c,d,e,f,g)->(rotPart . fromXYZ'' $ f,i)) tbl
 
-lookupMatrixW = lookup' (filter (not . hex) tbl)
+lookupM' :: Monad m => [Tbl] -> String -> SymbolSenseVectorOrientation -> m TransformedCoordinate
+lookupM' dataTable reason (sy,se,_,el)
+   = case (lookup' dataTable sy se el) of
+      Nothing -> fail reason
+      Just c  -> return c
 
-lookupMatrixWHex = lookup' $ filter hex tbl ++ filter (not . hex) tbl
+properMatrixW :: Monad m => SymbolSenseVectorOrientation -> m TransformedCoordinate
+properMatrixW = lookupM' dataTable "matrix W not found (proper)."
+    where
+      dataTable = filter (not . hex) tbl
 
-lookup' tbl a b c = lookup (a',b,rotPart . fromXYZ'' $ c) d
+hexagonalMatrixW :: Monad m => SymbolSenseVectorOrientation -> m TransformedCoordinate
+hexagonalMatrixW = lookupM' dataTable "matrix W not found (hexagonal)."
   where
-    a' | a `elem` ["a","b","c","d","n","g"] = "m"
-       | a == "t" = "1"
-       | otherwise = a
+    dataTable = filter hex tbl ++ filter (not . hex) tbl
+
+-- lookup' :: [Tbl] -> PointGroupSymmetryOperations
+lookup' tbl sym sen axis = lookup (a',sen,rotPart . fromXYZ'' $ axis) d
+  where
+    a' | sym `elem` ["a","b","c","d","n","g"] = "m"
+       | sym == "t" = "1"
+       | otherwise = sym
     d = map f tbl
     f (a,b,c,d,e,f,g) = ((b,c,rotPart . fromXYZ'' $ d),f)
 
@@ -143,7 +164,7 @@ type IsHex = Bool -- hex flag
 type Symbol = String
 type Sense = String
 type SymmetryElement = String
-type Orientation = [Integer] -- orientation
+type Orientation = [Integer] -- orientation or location
 type TransformedCoordinate = String
 type AxisOrNormal = [Integer]
 
@@ -238,11 +259,3 @@ tbl = [
   -- hexagonalでのlookup時には、hexagonal部分が優先となるよう、順番をいれかえている
   -- それ以外のケースでは除外している
   ]
-
-{--
-
-[Reference]
-W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
-listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
-
---}

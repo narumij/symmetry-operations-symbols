@@ -6,7 +6,7 @@ Maintainer  : narumij@gmail.com
 Stability   : experimental
 Portability : ?
 
-[Reference]
+[References]
 
 W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
 
@@ -16,15 +16,18 @@ listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2,
 
 module Data.Matrix.SymmetryOperationsSymbols.UnitMatrixCase (
   unitMatrixCase,
+  -- unitMatrixCase2,
   ) where
 
+import Data.Ratio (Ratio)    
 import Data.Matrix
 import Data.Matrix.SymmetryOperationsSymbols.Common
+import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
 
 -- | Case (i) The matrix W is the unit matrix:
-unitMatrixCase :: Matrix Rational -> Either ErrorMessage String
 unitMatrixCase w
-  | all (== 0) w' = Right " 1  "
-  | otherwise = Right $ " t " ++ tripletParen w' ++ " "
-  where
-    w' = toList . transPart $ w
+    | all (== 0) w' = return Identity
+    | otherwise     = return $ Translation { vector = (a,b,c) }
+    where
+      w'@[a,b,c] = toList . transPart $ w
+

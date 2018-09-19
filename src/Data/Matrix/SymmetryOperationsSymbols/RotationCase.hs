@@ -6,7 +6,7 @@ Maintainer  : narumij@gmail.com
 Stability   : experimental
 Portability : ?
 
-[Reference]
+[References]
 
 W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
 
@@ -23,25 +23,33 @@ import Data.Matrix hiding (transpose)
 import Data.Matrix.SymmetryOperationsSymbols.Solve
 import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
+import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
 
 -- | Case (ii) (a) W corresponds to a rotoinversion
---
--- [Reference]
---
--- W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
--- listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
-nFoldRotationCase :: Matrix Rational -> Either ErrorMessage String
-nFoldRotationCase m = maybeToEither "?? (rotation)" $ arrange m <$> solvingEquation m
+nFoldRotationCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+nFoldRotationCase m = arrange m <$> solvingEquation m
 
-arrange :: Matrix Rational -> [Rational] -> String
-arrange m ans | all (==0) screwPart = unwords [sym,prettyXYZ location]
-              | otherwise = unwords [sym ++ tripletParen screwPart,prettyXYZ location]
-  where
-    s = if null . senseOf $ m then " " else senseOf m
-    sym = " " ++ show (rotationType m) ++ s
-    screwPart = wg m
-    location = locationOf m <|> fromList 3 1 ans
-
+arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> SymmetryOperation a
+arrange m ans 
+  | rt == 2 && noScrew = TwoFoldRotation { axis = location }
+  | rt == 2            = TwoFoldScrew { axis = location, vector = (sa,sb,sc) }
+  | noScrew            = NFoldRotation { nFold = n, sense = sen, axis = location }
+  | otherwise          = NFoldScrew { nFold = n, sense = sen, axis = location, vector = (sa,sb,sc) }
+      where
+        noScrew = all (==0) screwPart 
+        rt = rotationType m
+        n | rt == 3 = ThreeFold
+          | rt == 4 = FourFold
+          | rt == 6 = SixFold
+        sen = case senseOf m of
+          "+" -> Positive
+          "-" -> Negative
+          _ -> error ""
+        s = if null . senseOf $ m then " " else senseOf m
+        sym = " " ++ show rt ++ s
+        screwPart@[sa,sb,sc] = toList (wg m)
+        location = locationOf m <|> fromList 3 1 ans
+    
 --
 
 -- for repl check
@@ -62,43 +70,40 @@ pow :: (Num a, Integral b) => Matrix a -> b -> Matrix a
 pow m 0 = identity 3
 pow m n = foldl1 multStd $ replicate (fromIntegral n) (rotPart m)
 
-t :: (Num b, Eq b) => Matrix b -> [b]
+-- (W,w)^(n-1) = t
+t :: (Num b, Eq b) => Matrix b -> Matrix b
 t mat = f [ pow mat n | n <- [0..(pred r)] ]
   where
     r = rotationType mat
-    w = toList . transPart $ mat
-    g n m = toList $ multStd m (fromList 3 1 n)
-    -- この操作が思い出せない、理解できない
-    f l = map sum $ transpose $ map (g w) l
+    w = transPart mat
+    g n m = multStd m n
+    f l = foldl1 (elementwise (+)) $ map (g w) l
 
 -- | (W,w)^n
-wg :: (Fractional b, Eq b) => Matrix b -> [b]
-wg mat = (/ fromIntegral r) <$> t mat
+wg :: (Fractional b, Eq b) => Matrix b -> Matrix b
+wg mat = fmap (/ fromIntegral r) (t mat)
   where
     r = rotationType mat
 
-wl :: (Fractional b, Eq b) => Matrix b -> [b]
-wl mat = zipWith (-) (toList . transPart $ mat) (wg mat)
+wl :: (Fractional b, Eq b) => Matrix b -> Matrix b
+wl mat = elementwise (-) (transPart mat) (wg mat)
 
-solvingEquation' :: Integral a => Matrix (Ratio a) -> Maybe [Ratio a]
+solvingEquation' :: Integral a => Matrix (Ratio a) -> Maybe (Matrix (Ratio a))
 solvingEquation' mat = solve (iw mat) (wl mat)
 
-solvingEquation :: Integral a => Matrix (Ratio a) -> Maybe [Ratio a]
-solvingEquation mat = do
+solvingEquation'' :: Integral a => Matrix (Ratio a) -> Maybe [Ratio a]
+solvingEquation'' mat = do
   sol <- solvingEquation' mat
-  adjustAnswerOnAxis mat sol
+  adjustAnswerOnAxis mat (toList sol)
+
+solvingEquation :: (Monad m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+solvingEquation mat = case solvingEquation'' mat of
+  Nothing -> fail "<Rot> when calculate equation."
+  Just a -> return a
 
 -- 検算。repl用
-check mat sol = if toList (multStd (iw mat) (vec sol)) == wl mat
+check mat sol = if toList (multStd (iw mat) (vec sol)) == toList (wl mat)
                 then sol
                 else error "General solution error."
     where
       vec l = fromList (length l) 1 l
-
-{--
-
-[Reference]
-W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
-listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
-
---}

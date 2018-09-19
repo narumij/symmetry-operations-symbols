@@ -8,38 +8,48 @@ Stability   : experimental
 Portability : ?
 
 -}
-module Data.Matrix.SymmetryOperationsSymbols.Parse (
-  parseSymmetryOperation
+module Data.Matrix.SymmetryOperationsSymbols.Parser (
+  -- symbolSenseVectorOrientation,
+  notHexagonal,
+  hexagonal,
+  symmetryElement,
   ) where
 
-import Control.Monad
-import Data.Maybe
-import Data.List
-import Text.ParserCombinators.Parsec
+import Control.Monad (join,guard)
+import Data.Maybe (fromMaybe,isJust)
+import Data.List (intercalate)
 
--- import TestData
+import Data.Matrix (Matrix)
+import Data.Ratio (Ratio)
 
-sign :: CharParser () Char
+import Text.Parsec
+import Text.Parsec.String (Parser)
+
+import Data.Matrix.SymmetryOperationsSymbols.Common
+import Data.Matrix.SymmetryOperationsSymbols.Calc
+
+
+sign :: Parser Char
 sign = oneOf "-+"
 
-zero :: CharParser () String
+zero :: Parser String
 zero = do
   char '0'
   return "0"
 
-num :: CharParser () String
+num :: Parser String
 num = do
   x <- oneOf "123456789"
   xs <- many digit
   return $ x : xs
 
-int :: CharParser () String
+int :: Parser String
 int = zero <|> num
 
-integer :: CharParser () String
+integer :: Parser String
 integer = int
 
-fract :: CharParser () String
+fract :: Parser String
 fract = do
   n <- int
   optionSpaces
@@ -48,14 +58,14 @@ fract = do
   d <- int
   return $ n ++ "/" ++ d
 
-number :: CharParser () String
+number :: Parser String
 number =   try fract
       <|> integer
 
-optionSpaces :: CharParser () ()
-optionSpaces = option () spaces
+optionSpaces :: Parser ()
+optionSpaces = skipMany space
 
-vector :: CharParser () String
+vector :: Parser String
 vector = do
   n1 <- num
   char ','
@@ -71,7 +81,7 @@ vector = do
       optionSpaces
       return $ maybe n1 (:n1) s
 
-elementBody :: CharParser () String
+elementBody :: Parser String
 elementBody = do
   n <- optionMaybe number
   optionSpaces
@@ -80,21 +90,21 @@ elementBody = do
   guard (isJust n || isJust v)
   return $ fromMaybe "" n ++ maybe "" (:[]) v
 
-one :: CharParser () String
+one :: Parser String
 one = do
   s <- optionMaybe sign
   optionSpaces
   n <- elementBody
   return $ maybe n (:n) s
 
-other :: CharParser () String
+other :: Parser String
 other = do
   s <- sign
   optionSpaces
   l <- elementBody
   return $ s:l
 
-component :: CharParser () String
+component :: Parser String
 component = do
   optionSpaces
   x <- one
@@ -102,7 +112,7 @@ component = do
   optionSpaces
   return $ join (x:xs)
 
-matrix :: CharParser () String
+matrix :: Parser String
 matrix = do
   n1 <- component
   char ','
@@ -111,36 +121,36 @@ matrix = do
   n3 <- component
   return $ intercalate "," [n1,n2,n3]
 
-parenVector :: CharParser () String
+parenVector :: Parser String
 parenVector = do
   char '('
   v <- vector
   char ')'
   return v
 
-elementFull :: CharParser () (String,String)
+elementFull :: Parser (String,String)
 elementFull = do -- (x,x,x) n,n,n
   v <- parenVector
   optionSpaces
   m <- matrix
   return (v,m)
 
-elementHalf :: CharParser () (String,String)
+elementHalf :: Parser (String,String)
 elementHalf = do -- n,n,n
   m <- matrix
   return ("",m)
 
-element :: CharParser () (String,String)
+element :: Parser (String,String)
 element = try elementFull <|> elementHalf
 
-identity :: CharParser () (String,String,String,String)
+identity :: Parser SymbolSenseVectorOrientation
 identity = do
   optionSpaces
   char '1'
   optionSpaces
   return ( "1", "", "", "" )
 
-transform :: CharParser () (String,String,String,String)
+transform :: Parser SymbolSenseVectorOrientation
 transform = do
   optionSpaces
   char 't'
@@ -148,7 +158,7 @@ transform = do
   vec <- parenVector
   return ( "t", "", vec, "" )
 
-inversion :: CharParser () (String,String,String,String)
+inversion :: Parser SymbolSenseVectorOrientation
 inversion = do
   optionSpaces
   string "-1"
@@ -157,7 +167,7 @@ inversion = do
   optionSpaces
   return ( "-1", "", vec, "" )
 
-miller :: CharParser () (String,String,String,String)
+miller :: Parser SymbolSenseVectorOrientation
 miller = do
   optionSpaces
   sy <- oneOf "abcm"
@@ -166,7 +176,7 @@ miller = do
   optionSpaces
   return ( [sy], "", "", ori )
 
-glide :: CharParser () (String,String,String,String)
+glide :: Parser SymbolSenseVectorOrientation
 glide = do
   optionSpaces
   sy <- oneOf "ndg"
@@ -175,10 +185,10 @@ glide = do
   optionSpaces
   return ( [sy], "", vec, ori )
 
-millerOrGlide :: CharParser () (String,String,String,String)
+millerOrGlide :: Parser SymbolSenseVectorOrientation
 millerOrGlide = try miller <|> glide
 
-rotation :: CharParser () (String,String,String,String)
+rotation :: Parser SymbolSenseVectorOrientation
 rotation = do
   optionSpaces
   sy <- oneOf "2436"
@@ -188,11 +198,11 @@ rotation = do
   optionSpaces
   return ( [sy],maybe "" (:[]) se, vec, ori )
 
-invRotation :: CharParser () (String,String,String,String)
+invRotation :: Parser SymbolSenseVectorOrientation
 invRotation = do
   optionSpaces
   char '-'
-  c <- oneOf "2436"
+  c <- oneOf "436"
   se <- sign
   optionSpaces
   ori <- matrix
@@ -203,28 +213,29 @@ invRotation = do
   optionSpaces
   return ( ['-',c], [se], vec, ori )
 
-geometricRepresentation' :: CharParser () (String,String,String,String)
-geometricRepresentation'
-  = try identity
-  <|> try transform
-  <|> try inversion
-  <|> try millerOrGlide
-  <|> try rotation
-  <|> invRotation
+symbolSenseVectorOrientation :: Parser SymbolSenseVectorOrientation
+symbolSenseVectorOrientation
+  = do
+    elements <- try identity
+            <|> try transform
+            <|> try inversion
+            <|> try millerOrGlide
+            <|> try rotation
+            <|> invRotation
+    optionSpaces
+    eof
+    return elements
 
-geometricRepresentation :: CharParser () (String,String,String,String)
-geometricRepresentation = do
-  a <- geometricRepresentation'
-  optionSpaces
-  eof
-  return a
+symmetryElement :: (SymbolSenseVectorOrientation -> Parser b) -> Parser b
+symmetryElement f = do
+    elements <- symbolSenseVectorOrientation
+    f elements
 
-parseSymmetryOperation' :: SourceName -> Either ParseError (String,String,String,String)
-parseSymmetryOperation' st = parse geometricRepresentation st st
+notHexagonal :: Integral a => Parser (Matrix (Ratio a))
+-- | referred to a cubic, tetragonal, orthorhombic, monoclinic, triclinic or rhombohedral
+notHexagonal = symmetryElement (deriveSymmetryOperation properMatrixW)
 
--- | 幾何表現の文字列をパースし、要素に分解する
-parseSymmetryOperation :: String -- ^ geometric repesentation like '-1 0,0,0' 'm x,0,z'
-                       -> Maybe (String,String,String,String) -- ^ ( Symbol part, Sense part, Vector part, Matrix part )
-parseSymmetryOperation st = case parseSymmetryOperation' st of
-  Left _ -> Nothing
-  Right s -> Just s
+hexagonal :: Integral a => Parser (Matrix (Ratio a))
+-- | referred to a hexagonal
+hexagonal = symmetryElement (deriveSymmetryOperation hexagonalMatrixW)
+
