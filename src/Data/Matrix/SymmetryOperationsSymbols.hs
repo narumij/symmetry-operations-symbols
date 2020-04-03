@@ -36,6 +36,8 @@ import Data.Matrix.SymmetryOperationsSymbols.RotInversionCase
 
 import Data.Matrix.SymmetryOperationsSymbols.Parser
 import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation -- (SymmetryOperation)
+import Data.Matrix.SymmetryOperationsSymbols.Calc
+
 
 -- for doctest
 import Data.Matrix.AsXYZ
@@ -72,28 +74,7 @@ fromMatrix'' m
   tr  = trace (rotPart m)
   det = detLU (rotPart m)
 
-type Trace a = Ratio a
-type Determinant a = Ratio a
-
--- Table 11.2.1.1. Identification of the type of the rotation part of the symmetry operation
-correpondToRotInversion :: Integral a => Trace a -> Determinant a -> Bool
-correpondToRotInversion (-3) (-1) = True -- -1
-correpondToRotInversion (-2) (-1) = True -- -6
-correpondToRotInversion (-1) (-1) = True -- -4
-correpondToRotInversion   0  (-1) = True -- -3
-correpondToRotInversion   _    _  = False
-
-correpondToNFoldRotation :: Integral a => Trace a -> Determinant a -> Bool
-correpondToNFoldRotation (-1) 1 = True -- 2
-correpondToNFoldRotation   0  1 = True -- 3
-correpondToNFoldRotation   1  1 = True -- 4
-correpondToNFoldRotation   2  1 = True -- 6
-correpondToNFoldRotation   _  _ = False
-
-correpondToGlideOrReflection :: Integral a => Trace a -> Determinant a -> Bool
-correpondToGlideOrReflection 1 (-1) = True -- m
-correpondToGlideOrReflection _   _  = False
-
+  
 -- 11.2.2. Derivation of coordinate triplets from symbols for symmetry operations
 
 -- | 対称操作の幾何的表現の文字列から行列表現の導出

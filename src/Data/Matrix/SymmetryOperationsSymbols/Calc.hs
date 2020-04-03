@@ -1,5 +1,8 @@
 module Data.Matrix.SymmetryOperationsSymbols.Calc (
     deriveSymmetryOperation
+    , correpondToRotInversion
+    , correpondToNFoldRotation
+    , correpondToGlideOrReflection
   ) where
 
 import Data.Ratio
@@ -17,7 +20,7 @@ deriveSymmetryOperation :: (Monad m, Integral a)
 deriveSymmetryOperation lookupFunc elements = calcMatrix elements <$> lookupFunc elements
 
 calcMatrix :: Integral a => SymbolSenseVectorOrientation -> String -> Matrix (Ratio a)
-calcMatrix (symbol,sense,vector,orientation) = calc symbol vector' orientation
+calcMatrix (symbol,sense,vector,orientation) = calc vector' orientation
     where
       vector' = fromMaybe vector . fromSymbol $ symbol
       fromSymbol "a" = Just "1/2,0,0"
@@ -26,24 +29,66 @@ calcMatrix (symbol,sense,vector,orientation) = calc symbol vector' orientation
       fromSymbol _   = Nothing
 
 -- 対称操作の幾何表現から行列表現へ変換する際の計算部分
-calc :: Integral a => String -> String -> String -> String -> Matrix (Ratio a)
-calc symbol vector orientation transCoord
-   -- 下の部分で計算したwを参照で得たmatrixWの回転操作部分と連結します
-   = rotPart matrixW <|> (modulo1 <$> w)
+calc :: Integral a => String -> String -> String -> Matrix (Ratio a)
+calc vector orientation transCoord
+   -- matrixWの回転操作部分と生成したwを連結します
+   = totalPart matrixW vector' orientation'
     where
+      -- 文字列から各種行列（ベクター）を生成します
       matrixW = fromXYZ'' transCoord
-      -- wl = (I-W)x の計算をします
-      wl = multStd (iw matrixW) (fromVec orientation)
-      wg = fromVec vector
-      -- w = wl + wgの計算をします
-      w | isNotInversions = elementwise (+) wl wg
-        -- inversionの場合、参照論文に記載がないが、別の計算が必要となり、それが以下
-        -- 試行錯誤でみつけたもので根拠となる論文をまだみつけていないが、
-        -- (ii) (a)の逆算でこうなった記憶
-        | otherwise = multStd (iw matrixW) (fromVec vector)
-      -- symbolがinversionの一種ではない場合、真となる
-      isNotInversions = symbol `notElem` ["-1","-2","-3","-4","-6"]
-      -- 0 <= x < 1 となるように剰余をとる
-      modulo1 n = mod' n 1
+      vector' = fromVec vector
+      orientation' = fromVec orientation
       -- ベクトル表記から3x1行列を生成する
       fromVec = transPart . fromXYZ''
+
+totalPart :: Integral a => Matrix (Ratio a) -> Matrix (Ratio a) -> Matrix (Ratio a) -> Matrix (Ratio a)
+totalPart matrixW vector orientation
+   -- matrixWの回転操作部分と生成したwを連結します
+   = rotPart matrixW <|> transPart' matrixW vector orientation
+
+transPart' :: Integral a => Matrix (Ratio a) -> Matrix (Ratio a) -> Matrix (Ratio a) -> Matrix (Ratio a)
+transPart' matrixW vector orientation
+   = elementwiseMod1 w
+    where
+      -- 0 <= x < 1 となるように全要素の剰余をとる
+      elementwiseMod1 m = flip mod' 1 <$> m
+      -- wl = (I-W)x の計算をします
+      wl = multStd inversionW orientation
+      wg = vector
+      -- w = wl + wgの計算をします
+      -- inversionの場合、参照論文に記載がないが、別の計算が必要となり、w関数の最初の行
+      -- 試行錯誤でみつけたもので根拠となる論文をまだみつけていないが、
+      -- (ii) (a)の逆算でこうなった
+      w | isRotInversion matrixW = multStd (iw matrixW) vector
+        | otherwise              = elementwise (+) wl wg
+      -- 回転部の符号を反転した行列
+      inversionW = iw matrixW
+
+isRotInversion :: Integral a => Matrix (Ratio a) -> Bool
+isRotInversion matrix
+    = correpondToRotInversion tr det
+    where
+      tr  = trace (rotPart matrix)
+      det = detLU (rotPart matrix)
+    
+type Trace a = Ratio a
+type Determinant a = Ratio a
+
+-- Table 11.2.1.1. Identification of the type of the rotation part of the symmetry operation
+correpondToRotInversion :: Integral a => Trace a -> Determinant a -> Bool
+correpondToRotInversion (-3) (-1) = True -- -1
+correpondToRotInversion (-2) (-1) = True -- -6
+correpondToRotInversion (-1) (-1) = True -- -4
+correpondToRotInversion   0  (-1) = True -- -3
+correpondToRotInversion   _    _  = False
+
+correpondToNFoldRotation :: Integral a => Trace a -> Determinant a -> Bool
+correpondToNFoldRotation (-1) 1 = True -- 2
+correpondToNFoldRotation   0  1 = True -- 3
+correpondToNFoldRotation   1  1 = True -- 4
+correpondToNFoldRotation   2  1 = True -- 6
+correpondToNFoldRotation   _  _ = False
+
+correpondToGlideOrReflection :: Integral a => Trace a -> Determinant a -> Bool
+correpondToGlideOrReflection 1 (-1) = True -- m
+correpondToGlideOrReflection _   _  = False
