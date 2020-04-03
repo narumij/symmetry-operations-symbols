@@ -161,14 +161,14 @@ lookup' tbl sym sen axis = lookup (a',sen,rotPart . fromXYZ'' $ axis) d
     f (a,b,c,d,e,f,g) = ((b,c,rotPart . fromXYZ'' $ d),f)
 
 type IsHex = Bool -- hex flag
-type Symbol = String
+type SymbolLabel = String
 type Sense = String
 type SymmetryElement = String
 type Orientation = [Integer] -- orientation or location
 type TransformedCoordinate = String
 type AxisOrNormal = [Integer]
 
-type Tbl = (IsHex,Symbol,Sense,SymmetryElement,Orientation,TransformedCoordinate,AxisOrNormal)
+type Tbl = (IsHex,SymbolLabel,Sense,SymmetryElement,Orientation,TransformedCoordinate,AxisOrNormal)
 
 tbl :: [Tbl]
 tbl = [
