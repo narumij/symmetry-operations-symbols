@@ -101,7 +101,7 @@ toShow RI6 = "-6"
 
 toLookup :: Symbol -> String
 toLookup Id = "1"
-toLookup T = "t"
+toLookup T = "1"
 toLookup Inv = "-1"
 toLookup M = "m"
 toLookup A = "m"
