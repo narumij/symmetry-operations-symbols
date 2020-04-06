@@ -1,5 +1,5 @@
 module Data.Matrix.SymmetryOperationsSymbols.Symbol (
-    Symbol
+    Symbol(..)
     , lookupSymbolLabel
   ) where
 
@@ -34,7 +34,8 @@ readT n = do
   return (T,st)
   
 readInv n = do
-  ("-1",st) <- lex n
+  ("-",nn) <- lex n
+  ("1",st) <- lex nn
   return (Inv,st)
 
 readM n = do
@@ -75,23 +76,26 @@ readR3 n = do
 
 readR4 n = do
   ("4",st) <- lex n
-  return (R3,st)
+  return (R4,st)
 
 readR6 n = do
   ("6",st) <- lex n
-  return (R3,st)
+  return (R6,st)
 
 readRI3 n = do
-  ("-3",st) <- lex n
-  return (R3,st)
+  ("-",nn) <- lex n
+  ("3",st) <- lex nn
+  return (RI3,st)
   
 readRI4 n = do
-  ("-4",st) <- lex n
-  return (R3,st)
+  ("-",nn) <- lex n
+  ("4",st) <- lex nn
+  return (RI4,st)
   
 readRI6 n = do
-  ("-6",st) <- lex n
-  return (R3,st)
+  ("-",nn) <- lex n
+  ("6",st) <- lex nn
+  return (RI6,st)
 
 instance Read Symbol where
   readsPrec _ = join . sequence readSymbols

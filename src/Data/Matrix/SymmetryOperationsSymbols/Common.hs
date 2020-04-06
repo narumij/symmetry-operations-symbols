@@ -40,6 +40,8 @@ import Data.Maybe
 import Data.Matrix.AsXYZ
 import Data.Ratio.Slash
 
+import Data.Matrix.SymmetryOperationsSymbols.Symbol
+
 type ErrorMessage = String
 type SymbolSenseVectorOrientation = (String,String,String,String)
 
@@ -122,18 +124,18 @@ locationOf mat = fromJust $ location <$> searchMapData mat
 orientationOf :: (Integral a) => Matrix (Ratio a) -> [Ratio a]
 orientationOf mat = fromJust $ orientation <$> searchMapData mat
 
-axis (a,b,c,d,e,f,g) = g
-hex (a,b,c,d,e,f,g) = a
-sense (_,_,s,_,_,_,_) = s
-location (_,_,_,o,_,_,_) = rotPart . fromXYZ'' $ o
-orientation (a,b,c,d,e,f,g) = fmap fromIntegral e
+axis (a,s,b,c,d,e,f,g) = g
+hex (a,s,b,c,d,e,f,g) = a
+sense (_,_,_,s,_,_,_,_) = s
+location (_,_,_,_,o,_,_,_) = rotPart . fromXYZ'' $ o
+orientation (a,s,b,c,d,e,f,g) = fmap fromIntegral e
 
 -- | 入力文字列が空だった場合に、4x4の0行列を返す
 fromXYZ'' s = fromMaybe (zero 4 4) (fromXYZ' s)
 
 searchMapData m = lookup (rotPart m) d
   where
-    d = map (\i@(a,b,c,d,e,f,g)->(rotPart . fromXYZ'' $ f,i)) tbl
+    d = map (\i@(a,s,b,c,d,e,f,g)->(rotPart . fromXYZ'' $ f,i)) tbl
 
 lookupM' :: Monad m => [Tbl] -> String -> SymbolSenseVectorOrientation -> m TransformedCoordinate
 lookupM' dataTable reason (sy,se,_,el)
@@ -152,13 +154,16 @@ hexagonalMatrixW = lookupM' dataTable "matrix W not found (hexagonal)."
     dataTable = filter hex tbl ++ filter (not . hex) tbl
 
 -- lookup' :: [Tbl] -> PointGroupSymmetryOperations
-lookup' tbl sym sen axis = lookup (a',sen,rotPart . fromXYZ'' $ axis) d
+lookup' tbl sym sen axis = lookup (lSym,sen,rotPart . fromXYZ'' $ axis) d
   where
+    sym' :: Symbol
+    sym' = read sym
+    lSym = lookupSymbolLabel sym'
     a' | sym `elem` ["a","b","c","d","n","g"] = "m"
        | sym == "t" = "1"
        | otherwise = sym
     d = map f tbl
-    f (a,b,c,d,e,f,g) = ((b,c,rotPart . fromXYZ'' $ d),f)
+    f (a,s,b,c,d,e,f,g) = ((b,c,rotPart . fromXYZ'' $ d),f)
 
 type IsHex = Bool -- hex flag
 type SymbolLabel = String
@@ -168,94 +173,94 @@ type Orientation = [Integer] -- orientation or location
 type TransformedCoordinate = String
 type AxisOrNormal = [Integer]
 
-type Tbl = (IsHex,SymbolLabel,Sense,SymmetryElement,Orientation,TransformedCoordinate,AxisOrNormal)
+type Tbl = (IsHex,Symbol,SymbolLabel,Sense,SymmetryElement,Orientation,TransformedCoordinate,AxisOrNormal)
 
 tbl :: [Tbl]
 tbl = [
 -- Table 11.2.2.1. Matrices for point-group symmetry operations and orientation
 -- of corresponding symmetry elements, referred to a cubic, tetragonal, orthorhombic,
 -- monoclinic, triclinic or rhombohedral coordinate system
-  (False,  "1",  "",        "",         [],     "x,y,z",         []),
-  (False,  "2",  "",   "0,0,z", [ 0, 0, 1],   "-x,-y,z", [ 0, 0, 1]),
-  (False,  "2",  "",   "0,y,0", [ 0, 1, 0],   "-x,y,-z", [ 0, 1, 0]),
-  (False,  "2",  "",   "x,0,0", [ 1, 0, 0],   "x,-y,-z", [ 1, 0, 0]),
-  (False,  "3", "+",   "x,x,x", [ 1, 1, 1],     "z,x,y", [ 1, 1, 1]),
-  (False,  "3", "+", "x,-x,-x", [ 1,-1,-1],   "-z,-x,y", [ 1,-1,-1]),
-  (False,  "3", "+", "-x,x,-x", [-1, 1,-1],   "z,-x,-y", [-1, 1,-1]),
-  (False,  "3", "+", "-x,-x,x", [-1,-1, 1],   "-z,x,-y", [-1,-1, 1]),
-  (False,  "3", "-",   "x,x,x", [ 1, 1, 1],     "y,z,x", [ 1, 1, 1]),
-  (False,  "3", "-", "x,-x,-x", [ 1,-1,-1],   "-y,z,-x", [ 1,-1,-1]),
-  (False,  "3", "-", "-x,x,-x", [-1, 1,-1],   "-y,-z,x", [-1, 1,-1]),
-  (False,  "3", "-", "-x,-x,x", [-1,-1, 1],   "y,-z,-x", [-1,-1, 1]),
-  (False,  "2",  "",   "x,x,0", [ 1, 1, 0],    "y,x,-z", [ 1, 1, 0]),
-  (False,  "2",  "",   "x,0,x", [ 1, 0, 1],    "z,-y,x", [ 1, 0, 1]),
-  (False,  "2",  "",   "0,y,y", [ 0, 1, 1],    "-x,z,y", [ 0, 1, 1]),
-  (False,  "2",  "",  "x,-x,0", [ 1,-1, 0],  "-y,-x,-z", [ 1,-1, 0]),
-  (False,  "2",  "",  "-x,0,x", [-1, 0, 1],  "-z,-y,-x", [-1, 0, 1]),
-  (False,  "2",  "",  "0,y,-y", [ 0, 1,-1],  "-x,-z,-y", [ 0, 1,-1]),
-  (False,  "4", "+",   "0,0,z", [ 0, 0, 1],    "-y,x,z", [ 0, 0, 1]),
-  (False,  "4", "+",   "0,y,0", [ 0, 1, 0],    "z,y,-x", [ 0, 1, 0]),
-  (False,  "4", "+",   "x,0,0", [ 1, 0, 0],    "x,-z,y", [ 1, 0, 0]),
-  (False,  "4", "-",   "0,0,z", [ 0, 0, 1],    "y,-x,z", [ 0, 0, 1]),
-  (False,  "4", "-",   "0,y,0", [ 0, 1, 0],    "-z,y,x", [ 0, 1, 0]),
-  (False,  "4", "-",   "x,0,0", [ 1, 0, 0],    "x,z,-y", [ 1, 0, 0]),
+  (False,  Id,  "1",  "",        "",         [],     "x,y,z",         []),
+  (False,  R2,  "2",  "",   "0,0,z", [ 0, 0, 1],   "-x,-y,z", [ 0, 0, 1]),
+  (False,  R2,  "2",  "",   "0,y,0", [ 0, 1, 0],   "-x,y,-z", [ 0, 1, 0]),
+  (False,  R2,  "2",  "",   "x,0,0", [ 1, 0, 0],   "x,-y,-z", [ 1, 0, 0]),
+  (False,  R3,  "3", "+",   "x,x,x", [ 1, 1, 1],     "z,x,y", [ 1, 1, 1]),
+  (False,  R3,  "3", "+", "x,-x,-x", [ 1,-1,-1],   "-z,-x,y", [ 1,-1,-1]),
+  (False,  R3,  "3", "+", "-x,x,-x", [-1, 1,-1],   "z,-x,-y", [-1, 1,-1]),
+  (False,  R3,  "3", "+", "-x,-x,x", [-1,-1, 1],   "-z,x,-y", [-1,-1, 1]),
+  (False,  R3,  "3", "-",   "x,x,x", [ 1, 1, 1],     "y,z,x", [ 1, 1, 1]),
+  (False,  R3,  "3", "-", "x,-x,-x", [ 1,-1,-1],   "-y,z,-x", [ 1,-1,-1]),
+  (False,  R3,  "3", "-", "-x,x,-x", [-1, 1,-1],   "-y,-z,x", [-1, 1,-1]),
+  (False,  R3,  "3", "-", "-x,-x,x", [-1,-1, 1],   "y,-z,-x", [-1,-1, 1]),
+  (False,  R2,  "2",  "",   "x,x,0", [ 1, 1, 0],    "y,x,-z", [ 1, 1, 0]),
+  (False,  R2,  "2",  "",   "x,0,x", [ 1, 0, 1],    "z,-y,x", [ 1, 0, 1]),
+  (False,  R2,  "2",  "",   "0,y,y", [ 0, 1, 1],    "-x,z,y", [ 0, 1, 1]),
+  (False,  R2,  "2",  "",  "x,-x,0", [ 1,-1, 0],  "-y,-x,-z", [ 1,-1, 0]),
+  (False,  R2,  "2",  "",  "-x,0,x", [-1, 0, 1],  "-z,-y,-x", [-1, 0, 1]),
+  (False,  R2,  "2",  "",  "0,y,-y", [ 0, 1,-1],  "-x,-z,-y", [ 0, 1,-1]),
+  (False,  R4,  "4", "+",   "0,0,z", [ 0, 0, 1],    "-y,x,z", [ 0, 0, 1]),
+  (False,  R4,  "4", "+",   "0,y,0", [ 0, 1, 0],    "z,y,-x", [ 0, 1, 0]),
+  (False,  R4,  "4", "+",   "x,0,0", [ 1, 0, 0],    "x,-z,y", [ 1, 0, 0]),
+  (False,  R4,  "4", "-",   "0,0,z", [ 0, 0, 1],    "y,-x,z", [ 0, 0, 1]),
+  (False,  R4,  "4", "-",   "0,y,0", [ 0, 1, 0],    "-z,y,x", [ 0, 1, 0]),
+  (False,  R4,  "4", "-",   "x,0,0", [ 1, 0, 0],    "x,z,-y", [ 1, 0, 0]),
 ----
-  (False, "-1",  "",   "0,0,0",         [],  "-x,-y,-z",         []),
-  (False,  "m",  "",   "x,y,0", [ 0, 0, 1],    "x,y,-z", [ 0, 0, 1]),
-  (False,  "m",  "",   "x,0,z", [ 0, 1, 0],    "x,-y,z", [ 0, 1, 0]),
-  (False,  "m",  "",   "0,y,z", [ 1, 0, 0],    "-x,y,z", [ 1, 0, 0]),
-  (False, "-3", "+",   "x,x,x", [ 1, 1, 1],  "-z,-x,-y", [ 1, 1, 1]),
-  (False, "-3", "+", "x,-x,-x", [ 1,-1,-1],    "z,x,-y", [ 1,-1,-1]),
-  (False, "-3", "+", "-x,x,-x", [-1, 1,-1],    "-z,x,y", [-1, 1,-1]),
-  (False, "-3", "+", "-x,-x,x", [-1,-1, 1],    "z,-x,y", [-1,-1, 1]),
-  (False, "-3", "-",   "x,x,x", [ 1, 1, 1],  "-y,-z,-x", [ 1, 1, 1]),
-  (False, "-3", "-", "x,-x,-x", [ 1,-1,-1],    "y,-z,x", [ 1,-1,-1]),
-  (False, "-3", "-", "-x,x,-x", [-1, 1,-1],    "y,z,-x", [-1, 1,-1]),
-  (False, "-3", "-", "-x,-x,x", [-1,-1, 1],    "-y,z,x", [-1,-1, 1]),
-  (False,  "m",  "",  "x,-x,z", [ 1, 1, 0],   "-y,-x,z", [ 1, 1, 0]),
-  (False,  "m",  "",  "-x,y,x", [ 1, 0, 1],   "-z,y,-x", [ 1, 0, 1]),
-  (False,  "m",  "",  "x,y,-y", [ 0, 1, 1],   "x,-z,-y", [ 0, 1, 1]),
-  (False,  "m",  "",   "x,x,z", [ 1,-1, 0],     "y,x,z", [ 1,-1, 0]),
-  (False,  "m",  "",   "x,y,x", [-1, 0, 1],     "z,y,x", [-1, 0, 1]),
-  (False,  "m",  "",   "x,y,y", [ 0, 1,-1],     "x,z,y", [ 0, 1,-1]),
-  (False, "-4", "+",   "0,0,z", [ 0, 0, 1],   "y,-x,-z", [ 0, 0, 1]),
-  (False, "-4", "+",   "0,y,0", [ 0, 1, 0],   "-z,-y,x", [ 0, 1, 0]),
-  (False, "-4", "+",   "x,0,0", [ 1, 0, 0],   "-x,z,-y", [ 1, 0, 0]),
-  (False, "-4", "-",   "0,0,z", [ 0, 0, 1],   "-y,x,-z", [ 0, 0, 1]),
-  (False, "-4", "-",   "0,y,0", [ 0, 1, 0],   "z,-y,-x", [ 0, 1, 0]),
-  (False, "-4", "-",   "x,0,0", [ 1, 0, 0],   "-x,-z,y", [ 1, 0, 0]),
+  (False, Inv, "-1",  "",   "0,0,0",         [],  "-x,-y,-z",         []),
+  (False,   M,  "m",  "",   "x,y,0", [ 0, 0, 1],    "x,y,-z", [ 0, 0, 1]),
+  (False,   M,  "m",  "",   "x,0,z", [ 0, 1, 0],    "x,-y,z", [ 0, 1, 0]),
+  (False,   M,  "m",  "",   "0,y,z", [ 1, 0, 0],    "-x,y,z", [ 1, 0, 0]),
+  (False, RI3, "-3", "+",   "x,x,x", [ 1, 1, 1],  "-z,-x,-y", [ 1, 1, 1]),
+  (False, RI3, "-3", "+", "x,-x,-x", [ 1,-1,-1],    "z,x,-y", [ 1,-1,-1]),
+  (False, RI3, "-3", "+", "-x,x,-x", [-1, 1,-1],    "-z,x,y", [-1, 1,-1]),
+  (False, RI3, "-3", "+", "-x,-x,x", [-1,-1, 1],    "z,-x,y", [-1,-1, 1]),
+  (False, RI3, "-3", "-",   "x,x,x", [ 1, 1, 1],  "-y,-z,-x", [ 1, 1, 1]),
+  (False, RI3, "-3", "-", "x,-x,-x", [ 1,-1,-1],    "y,-z,x", [ 1,-1,-1]),
+  (False, RI3, "-3", "-", "-x,x,-x", [-1, 1,-1],    "y,z,-x", [-1, 1,-1]),
+  (False, RI3, "-3", "-", "-x,-x,x", [-1,-1, 1],    "-y,z,x", [-1,-1, 1]),
+  (False,   M,  "m",  "",  "x,-x,z", [ 1, 1, 0],   "-y,-x,z", [ 1, 1, 0]),
+  (False,   M,  "m",  "",  "-x,y,x", [ 1, 0, 1],   "-z,y,-x", [ 1, 0, 1]),
+  (False,   M,  "m",  "",  "x,y,-y", [ 0, 1, 1],   "x,-z,-y", [ 0, 1, 1]),
+  (False,   M,  "m",  "",   "x,x,z", [ 1,-1, 0],     "y,x,z", [ 1,-1, 0]),
+  (False,   M,  "m",  "",   "x,y,x", [-1, 0, 1],     "z,y,x", [-1, 0, 1]),
+  (False,   M,  "m",  "",   "x,y,y", [ 0, 1,-1],     "x,z,y", [ 0, 1,-1]),
+  (False, RI4, "-4", "+",   "0,0,z", [ 0, 0, 1],   "y,-x,-z", [ 0, 0, 1]),
+  (False, RI4, "-4", "+",   "0,y,0", [ 0, 1, 0],   "-z,-y,x", [ 0, 1, 0]),
+  (False, RI4, "-4", "+",   "x,0,0", [ 1, 0, 0],   "-x,z,-y", [ 1, 0, 0]),
+  (False, RI4, "-4", "-",   "0,0,z", [ 0, 0, 1],   "-y,x,-z", [ 0, 0, 1]),
+  (False, RI4, "-4", "-",   "0,y,0", [ 0, 1, 0],   "z,-y,-x", [ 0, 1, 0]),
+  (False, RI4, "-4", "-",   "x,0,0", [ 1, 0, 0],   "-x,-z,y", [ 1, 0, 0]),
 -- Table 11.2.2.2. Matrices for point-group symmetry operations and orientation
 -- of corresponding symmetry elements, referred to a hexagonal coordinate system
-  ( True,  "1",  "",        "",         [],     "x,y,z",         []),
-  ( True,  "3", "+",   "0,0,z", [ 0, 0, 1],  "-y,x-y,z", [ 0, 0, 1]),
-  ( True,  "3", "-",   "0,0,z", [ 0, 0, 1],  "y-x,-x,z", [ 0, 0, 1]),
-  ( True,  "2",  "",   "0,0,z", [ 0, 0, 1],   "-x,-y,z", [ 0, 0, 1]),
-  ( True,  "6", "+",   "0,0,z", [ 0, 0, 1],   "x-y,x,z", [ 0, 0, 1]),
-  ( True,  "6", "-",   "0,0,z", [ 0, 0, 1],   "y,y-x,z", [ 0, 0, 1]),
-  ( True,  "2",  "",   "x,x,0", [ 1, 1, 0],    "y,x,-z", [ 1, 1, 0]),
-  ( True,  "2",  "",   "x,0,0", [ 1, 0, 0], "x-y,-y,-z", [ 1, 0, 0]),
-  ( True,  "2",  "",   "0,y,0", [ 0, 1, 0], "-x,y-x,-z", [ 0, 1, 0]),
-  ( True,  "2",  "",  "x,-x,0", [ 1,-1, 0],  "-y,-x,-z", [ 1,-1, 0]),
-  ( True,  "2",  "",  "x,2x,0", [ 1, 2, 0],  "y-x,y,-z", [ 1, 2, 0]),
-  ( True,  "2",  "",  "2x,x,0", [ 2, 1, 0],  "x,x-y,-z", [ 2, 1, 0]),
-  ( True, "-1",  "",   "0,0,0",         [],  "-x,-y,-z",         []),
-  ( True, "-3", "+",   "0,0,z", [ 0, 0, 1],  "y,y-x,-z", [ 0, 0, 1]),
-  ( True, "-3", "-",   "0,0,z", [ 0, 0, 1],  "x-y,x,-z", [ 0, 0, 1]),
-  ( True,  "m",  "",   "x,y,0", [ 0, 0, 1],    "x,y,-z", [ 0, 0, 1]),
-  ( True, "-6", "+",   "0,0,z", [ 0, 0, 1], "y-x,-x,-z", [ 0, 0, 1]),
-  ( True, "-6", "-",   "0,0,z", [ 0, 0, 1], "-y,x-y,-z", [ 0, 0, 1]),
-  ( True,  "m",  "",  "x,-x,z", [ 1, 1, 0],   "-y,-x,z", [ 1, 1, 0]),
+  ( True,  Id,  "1",  "",        "",         [],     "x,y,z",         []),
+  ( True,  R3,  "3", "+",   "0,0,z", [ 0, 0, 1],  "-y,x-y,z", [ 0, 0, 1]),
+  ( True,  R3,  "3", "-",   "0,0,z", [ 0, 0, 1],  "y-x,-x,z", [ 0, 0, 1]),
+  ( True,  R2,  "2",  "",   "0,0,z", [ 0, 0, 1],   "-x,-y,z", [ 0, 0, 1]),
+  ( True,  R6,  "6", "+",   "0,0,z", [ 0, 0, 1],   "x-y,x,z", [ 0, 0, 1]),
+  ( True,  R6,  "6", "-",   "0,0,z", [ 0, 0, 1],   "y,y-x,z", [ 0, 0, 1]),
+  ( True,  R2,  "2",  "",   "x,x,0", [ 1, 1, 0],    "y,x,-z", [ 1, 1, 0]),
+  ( True,  R2,  "2",  "",   "x,0,0", [ 1, 0, 0], "x-y,-y,-z", [ 1, 0, 0]),
+  ( True,  R2,  "2",  "",   "0,y,0", [ 0, 1, 0], "-x,y-x,-z", [ 0, 1, 0]),
+  ( True,  R2,  "2",  "",  "x,-x,0", [ 1,-1, 0],  "-y,-x,-z", [ 1,-1, 0]),
+  ( True,  R2,  "2",  "",  "x,2x,0", [ 1, 2, 0],  "y-x,y,-z", [ 1, 2, 0]),
+  ( True,  R2,  "2",  "",  "2x,x,0", [ 2, 1, 0],  "x,x-y,-z", [ 2, 1, 0]),
+  ( True, Inv, "-1",  "",   "0,0,0",         [],  "-x,-y,-z",         []),
+  ( True, RI3, "-3", "+",   "0,0,z", [ 0, 0, 1],  "y,y-x,-z", [ 0, 0, 1]),
+  ( True, RI3, "-3", "-",   "0,0,z", [ 0, 0, 1],  "x-y,x,-z", [ 0, 0, 1]),
+  ( True,   M,  "m",  "",   "x,y,0", [ 0, 0, 1],    "x,y,-z", [ 0, 0, 1]),
+  ( True, RI6, "-6", "+",   "0,0,z", [ 0, 0, 1], "y-x,-x,-z", [ 0, 0, 1]),
+  ( True, RI6, "-6", "-",   "0,0,z", [ 0, 0, 1], "-y,x-y,-z", [ 0, 0, 1]),
+  ( True,   M,  "m",  "",  "x,-x,z", [ 1, 1, 0],   "-y,-x,z", [ 1, 1, 0]),
 -- 以下二つが、Orientationを利用して解の補正をすることができなかったため、代替値を用意している
 -- 行列を解いた場合の解平面とorientationが一致していない可能性（2017の試行錯誤)
 -- そもそも勘違いの可能性もまだあるので、のちのち再確認する。
-  ( True,  "m",  "",  "x,2x,z", [ 1, 0, 0],   "y-x,y,z", [ 2,-1, 0]),
-  ( True,  "m",  "",  "2x,x,z", [ 0, 1, 0],   "x,x-y,z", [-1, 2, 0]),
+  ( True,   M,  "m",  "",  "x,2x,z", [ 1, 0, 0],   "y-x,y,z", [ 2,-1, 0]),
+  ( True,   M,  "m",  "",  "2x,x,z", [ 0, 1, 0],   "x,x-y,z", [-1, 2, 0]),
 
-  ( True,  "m",  "",   "x,x,z", [ 1,-1, 0],     "y,x,z", [ 1,-1, 0]),
-  ( True,  "m",  "",   "x,0,z", [ 1, 2, 0],  "x-y,-y,z", [ 1, 2, 0]),
-  ( True,  "m",  "",   "0,y,z", [ 2, 1, 0],  "-x,y-x,z", [ 2, 1, 0])
+  ( True,   M,  "m",  "",   "x,x,z", [ 1,-1, 0],     "y,x,z", [ 1,-1, 0]),
+  ( True,   M,  "m",  "",   "x,0,z", [ 1, 2, 0],  "x-y,-y,z", [ 1, 2, 0]),
+  ( True,   M,  "m",  "",   "0,y,z", [ 2, 1, 0],  "-x,y-x,z", [ 2, 1, 0])
   -- Notice
-  -- Hexagonal用のテーブルが、HexagonalのITで出現する対称操作全てをカヴァーしているわけではないことに注意
+  -- Hexagonal用のテーブルが、HexagonalのITで出現する対称操作全てをカバーしているわけではないことに注意
   -- hexagonalでのlookup時には、hexagonal部分が優先となるよう、順番をいれかえている
   -- それ以外のケースでは除外している
   ]
