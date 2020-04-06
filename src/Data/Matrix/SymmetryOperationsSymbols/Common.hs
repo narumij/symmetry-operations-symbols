@@ -140,15 +140,15 @@ searchByRotationPart m = lookup (rotPart m) d
   where
     d = map (\i@(a,s,b,c,d,e,f,g)->(rotPart . fromXYZ'' $ f,i)) tbl
 
-type MatrixLookupRecord = ((Symbol,Sense,Matrix (Ratio Integer)),TransformedCoordinate)
+type MatrixLookupRecord a = ((Symbol,Sense,Matrix (Ratio a)),TransformedCoordinate)
 
-lookupMatrixM :: Monad m => String -> [MatrixLookupRecord] -> SymbolSenseVectorOrientation -> m TransformedCoordinate
+lookupMatrixM :: Monad m => Integral a => String -> [MatrixLookupRecord a] -> SymbolSenseVectorOrientation -> m TransformedCoordinate
 lookupMatrixM reason dataTable (sy,se,_,el)
    = case lookupSSVO (primeSymbol sy, se, el) dataTable of
       Nothing -> fail reason
       Just c  -> return c
 
-lookupSSVO :: (Symbol,String,String) -> [MatrixLookupRecord] -> Maybe TransformedCoordinate
+lookupSSVO :: (Integral a) => (Symbol,String,String) -> [MatrixLookupRecord a] -> Maybe TransformedCoordinate
 lookupSSVO (sym, sen, axis) d = lookup (sym, sen, rotPart . fromXYZ'' $ axis) d
 
 properMatrixW :: Monad m => SymbolSenseVectorOrientation -> m TransformedCoordinate
@@ -160,9 +160,10 @@ hexagonalMatrixW = lookupMatrixM "matrix W not found (hexagonal)." (fromTbl hexa
 -- lookup' :: [Tbl] -> PointGroupSymmetryOperations
 -- lookupSSVO tbl= lookupSSVO' (tblSSVO tbl)
 
-fromTbl :: [Tbl] -> [MatrixLookupRecord]
+fromTbl :: (Integral a) => [Tbl] -> [MatrixLookupRecord a]
 fromTbl = map tblToMLR
 
+tblToMLR :: (Integral a) => Tbl -> MatrixLookupRecord a
 tblToMLR (a,s,b,c,d,e,f,g) = ((s,c,rotPart . fromXYZ'' $ d),f)
 
 properTbl :: [Tbl]
@@ -170,7 +171,6 @@ properTbl = filter (not . hex) tbl
 
 hexagonalTbl :: [Tbl]
 hexagonalTbl = filter hex tbl ++ filter (not . hex) tbl
-
 
 primeSymbol :: Symbol -> Symbol
 primeSymbol T = Id
