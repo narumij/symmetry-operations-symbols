@@ -1,6 +1,6 @@
 module Data.Matrix.SymmetryOperationsSymbols.Symbol (
     Symbol
-    , toLookup
+    , lookupSymbolLabel
   ) where
 
 import Control.Monad
@@ -25,96 +25,114 @@ data Symbol
    | RI6 -- '-6'
    deriving (Show)
 
-instance Read Symbol where
-  readsPrec _ = join . sequence [a,b,c,d,e,f,g,h,i,j,k,l,m,o,p,q,r]
-    where
-      a n = do
-        ("1",st) <- lex n
-        return (Id,st)
-      b n = do
-        ("-1",st) <- lex n
-        return (Inv,st)
-      c n = do
-        ("m",st) <- lex n
-        return (M,st)
-      d n = do
-        ("2",st) <- lex n
-        return (R2,st)
-      e n = do
-        ("3",st) <- lex n
-        return (R3,st)
-      f n = do
-        ("4",st) <- lex n
-        return (R4,st)
-      g n = do
-        ("6",st) <- lex n
-        return (R6,st)
-      h n = do
-        ("-3",st) <- lex n
-        return (RI3,st)
-      i n = do
-        ("-4",st) <- lex n
-        return (RI4,st)
-      j n = do
-        ("-6",st) <- lex n
-        return (RI6,st)
-      k n = do
-        ("t",st) <- lex n
-        return (T,st)
-      l n = do
-        ("a",st) <- lex n
-        return (T,st)
-      m n = do
-        ("b",st) <- lex n
-        return (T,st)
-      o n = do
-        ("c",st) <- lex n
-        return (T,st)
-      p n = do
-        ("d",st) <- lex n
-        return (T,st)
-      q n = do
-        ("g",st) <- lex n
-        return (T,st)
-      r n = do
-        ("n",st) <- lex n
-        return (T,st)
-                                            
-toShow :: Symbol -> String
-toShow Id = "1"
-toShow T = "t"
-toShow Inv = "-1"
-toShow M = "m"
-toShow A = "a"
-toShow B = "b"
-toShow C = "c"
-toShow D = "d"
-toShow G = "g"
-toShow N = "n"
-toShow R2 = "2"
-toShow R3 = "3"
-toShow R4 = "4"
-toShow R6 = "6"
-toShow RI3 = "-3"
-toShow RI4 = "-4"
-toShow RI6 = "-6"
+readId n = do
+  ("1",st) <- lex n
+  return (Id,st)
 
-toLookup :: Symbol -> String
-toLookup Id = "1"
-toLookup T = "1"
-toLookup Inv = "-1"
-toLookup M = "m"
-toLookup A = "m"
-toLookup B = "m"
-toLookup C = "m"
-toLookup D = "m"
-toLookup N = "m"
-toLookup G = "m"
-toLookup R2 = "2"
-toLookup R3 = "3"
-toLookup R4 = "4"
-toLookup R6 = "6"
-toLookup RI3 = "-3"
-toLookup RI4 = "-4"
-toLookup RI6 = "-6"
+readT n = do
+  ("t",st) <- lex n
+  return (T,st)
+  
+readInv n = do
+  ("-1",st) <- lex n
+  return (Inv,st)
+
+readM n = do
+  ("m",st) <- lex n
+  return (M,st)
+
+readA n = do
+  ("a",st) <- lex n
+  return (A,st)
+
+readB n = do
+  ("b",st) <- lex n
+  return (B,st)
+
+readC n = do
+  ("c",st) <- lex n
+  return (C,st)
+
+readD n = do
+  ("d",st) <- lex n
+  return (D,st)
+
+readG n = do
+  ("g",st) <- lex n
+  return (G,st)
+
+readN n = do
+  ("n",st) <- lex n
+  return (N,st)
+
+readR2 n = do
+  ("2",st) <- lex n
+  return (R2,st)
+
+readR3 n = do
+  ("3",st) <- lex n
+  return (R3,st)
+
+readR4 n = do
+  ("4",st) <- lex n
+  return (R3,st)
+
+readR6 n = do
+  ("6",st) <- lex n
+  return (R3,st)
+
+readRI3 n = do
+  ("-3",st) <- lex n
+  return (R3,st)
+  
+readRI4 n = do
+  ("-4",st) <- lex n
+  return (R3,st)
+  
+readRI6 n = do
+  ("-6",st) <- lex n
+  return (R3,st)
+
+instance Read Symbol where
+  readsPrec _ = join . sequence readSymbols
+    where
+      readSymbols = [
+        readId, readT,
+        readM, readA, readB, readC, readD, readG, readN,
+        readR2, readR3, readR4, readR6,
+        readInv, readRI3, readRI4, readRI6
+        ]
+
+                                            
+fromSymbol :: Symbol -> String
+fromSymbol Id = "1"
+fromSymbol T = "t"
+fromSymbol Inv = "-1"
+fromSymbol M = "m"
+fromSymbol A = "a"
+fromSymbol B = "b"
+fromSymbol C = "c"
+fromSymbol D = "d"
+fromSymbol G = "g"
+fromSymbol N = "n"
+fromSymbol R2 = "2"
+fromSymbol R3 = "3"
+fromSymbol R4 = "4"
+fromSymbol R6 = "6"
+fromSymbol RI3 = "-3"
+fromSymbol RI4 = "-4"
+fromSymbol RI6 = "-6"
+
+lookupSymbol :: Symbol -> Symbol
+lookupSymbol T = Id
+lookupSymbol A = M
+lookupSymbol B = M
+lookupSymbol C = M
+lookupSymbol D = M
+lookupSymbol N = M
+lookupSymbol G = M
+lookupSymbol otherSymbol = otherSymbol
+
+lookupSymbolLabel :: Symbol -> String
+lookupSymbolLabel = fromSymbol . lookupSymbol
 
