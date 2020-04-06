@@ -124,6 +124,7 @@ locationOf mat = fromJust $ location <$> searchMapData mat
 orientationOf :: (Integral a) => Matrix (Ratio a) -> [Ratio a]
 orientationOf mat = fromJust $ orientation <$> searchMapData mat
 
+-- テーブルのレコードからほしい要素を取り出す関数たち
 axis (a,s,b,c,d,e,f,g) = g
 hex (a,s,b,c,d,e,f,g) = a
 sense (_,_,_,s,_,_,_,_) = s
