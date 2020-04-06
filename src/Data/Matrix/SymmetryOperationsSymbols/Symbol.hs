@@ -24,6 +24,35 @@ data Symbol
    | RI6 -- '-6'
    deriving (Show,Eq)
 
+instance Read Symbol where
+  readsPrec _ = join . sequence readSymbols
+    where
+      readSymbols = [
+        readId, readT,
+        readM, readA, readB, readC, readD, readG, readN,
+        readR2, readR3, readR4, readR6,
+        readInv, readRI3, readRI4, readRI6
+        ]
+                                              
+fromSymbol :: Symbol -> String
+fromSymbol  Id =  "1"
+fromSymbol   T =  "t"
+fromSymbol Inv = "-1"
+fromSymbol   M =  "m"
+fromSymbol   A =  "a"
+fromSymbol   B =  "b"
+fromSymbol   C =  "c"
+fromSymbol   D =  "d"
+fromSymbol   G =  "g"
+fromSymbol   N =  "n"
+fromSymbol  R2 =  "2"
+fromSymbol  R3 =  "3"
+fromSymbol  R4 =  "4"
+fromSymbol  R6 =  "6"
+fromSymbol RI3 = "-3"
+fromSymbol RI4 = "-4"
+fromSymbol RI6 = "-6"
+
 readId n = do
   ("1",st) <- lex n
   return (Id,st)
@@ -95,36 +124,4 @@ readRI6 n = do
   ("-",nn) <- lex n
   ("6",st) <- lex nn
   return (RI6,st)
-
-instance Read Symbol where
-  readsPrec _ = join . sequence readSymbols
-    where
-      readSymbols = [
-        readId, readT,
-        readM, readA, readB, readC, readD, readG, readN,
-        readR2, readR3, readR4, readR6,
-        readInv, readRI3, readRI4, readRI6
-        ]
-
-                                            
-fromSymbol :: Symbol -> String
-fromSymbol Id = "1"
-fromSymbol T = "t"
-fromSymbol Inv = "-1"
-fromSymbol M = "m"
-fromSymbol A = "a"
-fromSymbol B = "b"
-fromSymbol C = "c"
-fromSymbol D = "d"
-fromSymbol G = "g"
-fromSymbol N = "n"
-fromSymbol R2 = "2"
-fromSymbol R3 = "3"
-fromSymbol R4 = "4"
-fromSymbol R6 = "6"
-fromSymbol RI3 = "-3"
-fromSymbol RI4 = "-4"
-fromSymbol RI6 = "-6"
-
-
 
