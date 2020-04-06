@@ -157,9 +157,6 @@ properMatrixW = lookupMatrixM "matrix W not found (proper)." (fromTbl properTbl)
 hexagonalMatrixW :: Monad m => SymbolSenseVectorOrientation -> m TransformedCoordinate
 hexagonalMatrixW = lookupMatrixM "matrix W not found (hexagonal)." (fromTbl hexagonalTbl)
 
--- lookup' :: [Tbl] -> PointGroupSymmetryOperations
--- lookupSSVO tbl= lookupSSVO' (tblSSVO tbl)
-
 fromTbl :: (Integral a) => [Tbl] -> [MatrixLookupRecord a]
 fromTbl = map tblToMLR
 
