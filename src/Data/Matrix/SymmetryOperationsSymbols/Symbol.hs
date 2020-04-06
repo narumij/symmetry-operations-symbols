@@ -1,7 +1,5 @@
 module Data.Matrix.SymmetryOperationsSymbols.Symbol (
     Symbol(..)
-    , lookupSymbol
-    , lookupSymbolLabel
   ) where
 
 import Control.Monad
@@ -128,16 +126,5 @@ fromSymbol RI3 = "-3"
 fromSymbol RI4 = "-4"
 fromSymbol RI6 = "-6"
 
-lookupSymbol :: Symbol -> Symbol
-lookupSymbol T = Id
-lookupSymbol A = M
-lookupSymbol B = M
-lookupSymbol C = M
-lookupSymbol D = M
-lookupSymbol N = M
-lookupSymbol G = M
-lookupSymbol otherSymbol = otherSymbol
 
-lookupSymbolLabel :: Symbol -> String
-lookupSymbolLabel = fromSymbol . lookupSymbol
 

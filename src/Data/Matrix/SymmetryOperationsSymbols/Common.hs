@@ -160,6 +160,16 @@ lookup' tbl symLbl sen axis = lookup (sym, sen, rotPart . fromXYZ'' $ axis) d
     d = map f tbl
     f (a,s,b,c,d,e,f,g) = ((s,c,rotPart . fromXYZ'' $ d),f)
 
+lookupSymbol :: Symbol -> Symbol
+lookupSymbol T = Id
+lookupSymbol A = M
+lookupSymbol B = M
+lookupSymbol C = M
+lookupSymbol D = M
+lookupSymbol N = M
+lookupSymbol G = M
+lookupSymbol otherSymbol = otherSymbol
+
 type IsHex = Bool -- hex flag
 type SymbolLabel = String
 type Sense = String

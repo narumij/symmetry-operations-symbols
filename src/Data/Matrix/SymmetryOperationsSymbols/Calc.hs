@@ -23,15 +23,11 @@ deriveSymmetryOperation lookupFunc elements = calcMatrix elements <$> lookupFunc
 calcMatrix :: Integral a => SymbolSenseVectorOrientation -> String -> Matrix (Ratio a)
 calcMatrix (symbol,sense,vector,orientation) = calc vector' orientation
     where
-      vector' = fromMaybe vector . fromSymbol' $ symbol
-      fromSymbol "a" = Just "1/2,0,0"
-      fromSymbol "b" = Just "0,1/2,0"
-      fromSymbol "c" = Just "0,0,1/2"
+      vector' = fromMaybe vector . fromSymbol $ symbol
+      fromSymbol A = Just "1/2,0,0"
+      fromSymbol B = Just "0,1/2,0"
+      fromSymbol C = Just "0,0,1/2"
       fromSymbol _   = Nothing
-      fromSymbol' A = Just "1/2,0,0"
-      fromSymbol' B = Just "0,1/2,0"
-      fromSymbol' C = Just "0,0,1/2"
-      fromSymbol' _   = Nothing
 
 -- 対称操作の幾何表現から行列表現へ変換する際の計算部分
 calc :: Integral a => String -> String -> String -> Matrix (Ratio a)
@@ -58,16 +54,16 @@ transPart' matrixW vector orientation
       -- 0 <= x < 1 となるように全要素の剰余をとる
       elementwiseMod1 m = flip mod' 1 <$> m
       -- wl = (I-W)x の計算をします
-      wl = multStd iw' orientation
+      wl = multStd matrixIW orientation
       wg = vector
       -- w = wl + wgの計算をします
       -- inversionの場合、参照論文に記載がないが、別の計算が必要となり、w関数の最初の行
       -- 試行錯誤でみつけたもので根拠となる論文をまだみつけていないが、
       -- (ii) (a)の逆算でこうなった
-      w | isRotInversion matrixW = multStd iw' vector
+      w | isRotInversion matrixW = multStd matrixIW vector
         | otherwise              = elementwise (+) wl wg
       -- 行列 I-W
-      iw' = iw matrixW
+      matrixIW = iw matrixW
 
 isRotInversion :: Integral a => Matrix (Ratio a) -> Bool
 isRotInversion matrix
