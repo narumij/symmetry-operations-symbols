@@ -43,7 +43,7 @@ import Data.Ratio.Slash
 import Data.Matrix.SymmetryOperationsSymbols.Symbol
 
 type ErrorMessage = String
-type SymbolSenseVectorOrientation = (String,String,String,String)
+type SymbolSenseVectorOrientation = (Symbol,String,String,String)
 
 -- | borrowed from Base ?.?.?
 maybeToEither :: a -> Maybe b -> Either a b
@@ -156,7 +156,8 @@ hexagonalMatrixW = lookupM' dataTable "matrix W not found (hexagonal)."
 -- lookup' :: [Tbl] -> PointGroupSymmetryOperations
 lookup' tbl symLbl sen axis = lookup (sym, sen, rotPart . fromXYZ'' $ axis) d
   where
-    sym = lookupSymbol $ read symLbl
+--    sym = lookupSymbol $ read symLbl
+    sym = lookupSymbol symLbl
     d = map f tbl
     f (a,s,b,c,d,e,f,g) = ((s,c,rotPart . fromXYZ'' $ d),f)
 

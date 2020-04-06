@@ -5,6 +5,7 @@ import Text.ParserCombinators.Parsec
 
 import Data.Matrix.SymmetryOperationsSymbols
 import Data.Matrix.SymmetryOperationsSymbols.Parser
+import Data.Matrix.SymmetryOperationsSymbols.Symbol
 
 import Data.Matrix
 import Data.Matrix.AsXYZ
@@ -12,7 +13,7 @@ import Data.Matrix.AsXYZ
 import TestDataOthers
 import TestDataHex
 
-parseSymmetryOperation :: String -> Either String (String,String,String,String)
+parseSymmetryOperation :: String -> Either String (Symbol,String,String,String)
 parseSymmetryOperation st = case parse (symmetryElement return) st st of
   Right a -> Right a
   Left m -> Left "Parse Error."

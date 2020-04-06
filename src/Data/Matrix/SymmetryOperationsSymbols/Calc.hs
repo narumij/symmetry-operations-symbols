@@ -10,6 +10,7 @@ import Data.Matrix
 import Data.Fixed
 import Data.Maybe
 import Data.Matrix.SymmetryOperationsSymbols.Common
+import Data.Matrix.SymmetryOperationsSymbols.Symbol
 
 -- (<|>)の衝突を避けたくてParse.hsと分けてある
 
@@ -22,11 +23,15 @@ deriveSymmetryOperation lookupFunc elements = calcMatrix elements <$> lookupFunc
 calcMatrix :: Integral a => SymbolSenseVectorOrientation -> String -> Matrix (Ratio a)
 calcMatrix (symbol,sense,vector,orientation) = calc vector' orientation
     where
-      vector' = fromMaybe vector . fromSymbol $ symbol
+      vector' = fromMaybe vector . fromSymbol' $ symbol
       fromSymbol "a" = Just "1/2,0,0"
       fromSymbol "b" = Just "0,1/2,0"
       fromSymbol "c" = Just "0,0,1/2"
       fromSymbol _   = Nothing
+      fromSymbol' A = Just "1/2,0,0"
+      fromSymbol' B = Just "0,1/2,0"
+      fromSymbol' C = Just "0,0,1/2"
+      fromSymbol' _   = Nothing
 
 -- 対称操作の幾何表現から行列表現へ変換する際の計算部分
 calc :: Integral a => String -> String -> String -> Matrix (Ratio a)

@@ -27,6 +27,7 @@ import Text.Parsec.String (Parser)
 
 import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.SymmetryOperationsSymbols.Calc
+import Data.Matrix.SymmetryOperationsSymbols.Symbol
 
 
 sign :: Parser Char
@@ -148,7 +149,7 @@ identity = do
   optionSpaces
   char '1'
   optionSpaces
-  return ( "1", "", "", "" )
+  return ( Id, "", "", "" )
 
 transform :: Parser SymbolSenseVectorOrientation
 transform = do
@@ -156,7 +157,7 @@ transform = do
   char 't'
   optionSpaces
   vec <- parenVector
-  return ( "t", "", vec, "" )
+  return ( T, "", vec, "" )
 
 inversion :: Parser SymbolSenseVectorOrientation
 inversion = do
@@ -165,7 +166,7 @@ inversion = do
   optionSpaces
   vec <- vector
   optionSpaces
-  return ( "-1", "", vec, "" )
+  return ( Inv, "", vec, "" )
 
 miller :: Parser SymbolSenseVectorOrientation
 miller = do
@@ -174,7 +175,7 @@ miller = do
   optionSpaces
   ori <- matrix
   optionSpaces
-  return ( [sy], "", "", ori )
+  return ( read [sy], "", "", ori )
 
 glide :: Parser SymbolSenseVectorOrientation
 glide = do
@@ -183,7 +184,7 @@ glide = do
   optionSpaces
   (vec,ori) <- element
   optionSpaces
-  return ( [sy], "", vec, ori )
+  return ( read [sy], "", vec, ori )
 
 millerOrGlide :: Parser SymbolSenseVectorOrientation
 millerOrGlide = try miller <|> glide
@@ -196,7 +197,7 @@ rotation = do
   optionSpaces
   (vec,ori) <- element
   optionSpaces
-  return ( [sy],maybe "" (:[]) se, vec, ori )
+  return ( read [sy],maybe "" (:[]) se, vec, ori )
 
 invRotation :: Parser SymbolSenseVectorOrientation
 invRotation = do
@@ -211,7 +212,7 @@ invRotation = do
   optionSpaces
   vec <- vector
   optionSpaces
-  return ( ['-',c], [se], vec, ori )
+  return ( read ['-',c], [se], vec, ori )
 
 symbolSenseVectorOrientation :: Parser SymbolSenseVectorOrientation
 symbolSenseVectorOrientation
