@@ -113,16 +113,16 @@ rate ans basis
 ----------------------
 
 axisOf :: (Integral a,Num b) => Matrix (Ratio a) -> [b]
-axisOf mat = fromJust $ fmap fromIntegral . axis <$> searchMapData mat
+axisOf mat = fromJust $ fmap fromIntegral . axis <$> searchByRotationPart mat
 
 senseOf :: (Integral a) => Matrix (Ratio a) -> String
-senseOf mat = fromJust $ sense <$> searchMapData mat
+senseOf mat = fromJust $ sense <$> searchByRotationPart mat
 
 locationOf :: (Integral a) => Matrix (Ratio a) -> Matrix (Ratio a)
-locationOf mat = fromJust $ location <$> searchMapData mat
+locationOf mat = fromJust $ location <$> searchByRotationPart mat
 
 orientationOf :: (Integral a) => Matrix (Ratio a) -> [Ratio a]
-orientationOf mat = fromJust $ orientation <$> searchMapData mat
+orientationOf mat = fromJust $ orientation <$> searchByRotationPart mat
 
 -- テーブルのレコードからほしい要素を取り出す関数たち
 axis (a,s,b,c,d,e,f,g) = if null g then e else g
@@ -134,42 +134,53 @@ orientation (a,s,b,c,d,e,f,g) = fmap fromIntegral e
 -- | 入力文字列が空だった場合に、4x4の0行列を返す
 fromXYZ'' s = fromMaybe (zero 4 4) (fromXYZ' s)
 
-searchMapData m = lookup (rotPart m) d
+-- | 入力の行列に該当するレコードを返却する
+-- 行列の内容に対して一意なので、hexagonalを区別する必要がない
+searchByRotationPart m = lookup (rotPart m) d
   where
     d = map (\i@(a,s,b,c,d,e,f,g)->(rotPart . fromXYZ'' $ f,i)) tbl
 
-lookupM' :: Monad m => [Tbl] -> String -> SymbolSenseVectorOrientation -> m TransformedCoordinate
-lookupM' dataTable reason (sy,se,_,el)
-   = case (lookup' dataTable sy se el) of
+type MatrixLookupRecord = ((Symbol,Sense,Matrix (Ratio Integer)),TransformedCoordinate)
+
+lookupMatrixM :: Monad m => String -> [MatrixLookupRecord] -> SymbolSenseVectorOrientation -> m TransformedCoordinate
+lookupMatrixM reason dataTable (sy,se,_,el)
+   = case lookupSSVO (primeSymbol sy, se, el) dataTable of
       Nothing -> fail reason
       Just c  -> return c
 
+lookupSSVO :: (Symbol,String,String) -> [MatrixLookupRecord] -> Maybe TransformedCoordinate
+lookupSSVO (sym, sen, axis) d = lookup (sym, sen, rotPart . fromXYZ'' $ axis) d
+
 properMatrixW :: Monad m => SymbolSenseVectorOrientation -> m TransformedCoordinate
-properMatrixW = lookupM' dataTable "matrix W not found (proper)."
-    where
-      dataTable = filter (not . hex) tbl
+properMatrixW = lookupMatrixM "matrix W not found (proper)." (fromTbl properTbl)
 
 hexagonalMatrixW :: Monad m => SymbolSenseVectorOrientation -> m TransformedCoordinate
-hexagonalMatrixW = lookupM' dataTable "matrix W not found (hexagonal)."
-  where
-    dataTable = filter hex tbl ++ filter (not . hex) tbl
+hexagonalMatrixW = lookupMatrixM "matrix W not found (hexagonal)." (fromTbl hexagonalTbl)
 
 -- lookup' :: [Tbl] -> PointGroupSymmetryOperations
-lookup' tbl symLbl sen axis = lookup (sym, sen, rotPart . fromXYZ'' $ axis) d
-  where
-    sym = lookupSymbol symLbl
-    d = map f tbl
-    f (a,s,b,c,d,e,f,g) = ((s,c,rotPart . fromXYZ'' $ d),f)
+-- lookupSSVO tbl= lookupSSVO' (tblSSVO tbl)
 
-lookupSymbol :: Symbol -> Symbol
-lookupSymbol T = Id
-lookupSymbol A = M
-lookupSymbol B = M
-lookupSymbol C = M
-lookupSymbol D = M
-lookupSymbol N = M
-lookupSymbol G = M
-lookupSymbol otherSymbol = otherSymbol
+fromTbl :: [Tbl] -> [MatrixLookupRecord]
+fromTbl = map tblToMLR
+
+tblToMLR (a,s,b,c,d,e,f,g) = ((s,c,rotPart . fromXYZ'' $ d),f)
+
+properTbl :: [Tbl]
+properTbl = filter (not . hex) tbl
+
+hexagonalTbl :: [Tbl]
+hexagonalTbl = filter hex tbl ++ filter (not . hex) tbl
+
+
+primeSymbol :: Symbol -> Symbol
+primeSymbol T = Id
+primeSymbol A = M
+primeSymbol B = M
+primeSymbol C = M
+primeSymbol D = M
+primeSymbol N = M
+primeSymbol G = M
+primeSymbol otherSymbol = otherSymbol
 
 type IsHex = Bool -- hex flag
 type SymbolLabel = String
@@ -262,6 +273,8 @@ tbl = [
 -- 行列を解いた場合の解平面とorientationが一致していない可能性（2017の試行錯誤)
 -- そもそも勘違いの可能性もまだあるので、のちのち再確認する。
 -- hackageに登録するに至らない理由の一つ
+-- 正規化された値として正しいが、正規化の結果、復元に必要な情報が欠落してしまった可能性(2020リファクタリング時の見解)
+-- どうしてこうなっているのか、やっぱりわからない。
   ( True,   M,  "m",  "",  "x,2x,z", [ 1, 0, 0],   "y-x,y,z", [ 2,-1, 0]),
   ( True,   M,  "m",  "",  "2x,x,z", [ 0, 1, 0],   "x,x-y,z", [-1, 2, 0]),
 
