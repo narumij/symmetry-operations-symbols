@@ -1,5 +1,6 @@
 module Data.Matrix.SymmetryOperationsSymbols.Symbol (
     Symbol(..)
+    , lookupSymbol
     , lookupSymbolLabel
   ) where
 
@@ -23,7 +24,7 @@ data Symbol
    | RI3 -- '-3'
    | RI4 -- '-4'
    | RI6 -- '-6'
-   deriving (Show)
+   deriving (Show,Eq)
 
 readId n = do
   ("1",st) <- lex n

@@ -154,16 +154,11 @@ hexagonalMatrixW = lookupM' dataTable "matrix W not found (hexagonal)."
     dataTable = filter hex tbl ++ filter (not . hex) tbl
 
 -- lookup' :: [Tbl] -> PointGroupSymmetryOperations
-lookup' tbl sym sen axis = lookup (lSym,sen,rotPart . fromXYZ'' $ axis) d
+lookup' tbl symLbl sen axis = lookup (sym, sen, rotPart . fromXYZ'' $ axis) d
   where
-    sym' :: Symbol
-    sym' = read sym
-    lSym = lookupSymbolLabel sym'
-    a' | sym `elem` ["a","b","c","d","n","g"] = "m"
-       | sym == "t" = "1"
-       | otherwise = sym
+    sym = lookupSymbol $ read symLbl
     d = map f tbl
-    f (a,s,b,c,d,e,f,g) = ((b,c,rotPart . fromXYZ'' $ d),f)
+    f (a,s,b,c,d,e,f,g) = ((s,c,rotPart . fromXYZ'' $ d),f)
 
 type IsHex = Bool -- hex flag
 type SymbolLabel = String
