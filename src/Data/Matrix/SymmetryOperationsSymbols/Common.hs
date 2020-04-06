@@ -179,15 +179,13 @@ primeSymbol N = M
 primeSymbol G = M
 primeSymbol otherSymbol = otherSymbol
 
-type IsHex = Bool -- hex flag
+data Lattice = Hexagonal | AnythingElse deriving (Eq)
 type SymbolLabel = String
 type Sense = String
 type SymmetryElement = String
 type Orientation = [Integer] -- orientation or location
 type TransformedCoordinate = String
 type AxisOrNormal = [Integer]
-
-data Lattice = Hexagonal | AnythingElse deriving (Eq)
 
 type Tbl = (Lattice,Symbol,SymbolLabel,Sense,SymmetryElement,Orientation,TransformedCoordinate,AxisOrNormal)
 
