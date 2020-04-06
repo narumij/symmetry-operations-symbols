@@ -58,16 +58,16 @@ transPart' matrixW vector orientation
       -- 0 <= x < 1 となるように全要素の剰余をとる
       elementwiseMod1 m = flip mod' 1 <$> m
       -- wl = (I-W)x の計算をします
-      wl = multStd inversionW orientation
+      wl = multStd iw' orientation
       wg = vector
       -- w = wl + wgの計算をします
       -- inversionの場合、参照論文に記載がないが、別の計算が必要となり、w関数の最初の行
       -- 試行錯誤でみつけたもので根拠となる論文をまだみつけていないが、
       -- (ii) (a)の逆算でこうなった
-      w | isRotInversion matrixW = multStd (iw matrixW) vector
+      w | isRotInversion matrixW = multStd iw' vector
         | otherwise              = elementwise (+) wl wg
-      -- 回転部の符号を反転した行列
-      inversionW = iw matrixW
+      -- 行列 I-W
+      iw' = iw matrixW
 
 isRotInversion :: Integral a => Matrix (Ratio a) -> Bool
 isRotInversion matrix
