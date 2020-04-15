@@ -126,7 +126,7 @@ orientationOf mat = fromJust $ orientation <$> searchByRotationPart mat
 
 -- テーブルのレコードからほしい要素を取り出す関数たち
 axis (a,s,b,c,d,e,f,g) = if null g then e else g
-hex (a,s,b,c,d,e,f,g) = a == Hexagonal
+isHex (a,s,b,c,d,e,f,g) = a == Hexagonal
 sense (_,_,_,s,_,_,_,_) = s
 location (_,_,_,_,o,_,_,_) = rotPart . fromXYZ'' $ o
 orientation (a,s,b,c,d,e,f,g) = fmap fromIntegral e
@@ -164,10 +164,10 @@ tblToMLR :: (Integral a) => Tbl -> MatrixLookupRecord a
 tblToMLR (a,s,b,c,d,e,f,g) = ((s,c,rotPart . fromXYZ'' $ d),f)
 
 properTbl :: [Tbl]
-properTbl = filter (not . hex) tbl
+properTbl = filter (not . isHex) tbl
 
 hexagonalTbl :: [Tbl]
-hexagonalTbl = filter hex tbl ++ filter (not . hex) tbl
+hexagonalTbl = filter isHex tbl ++ filter (not . isHex) tbl
 
 primeSymbol :: Symbol -> Symbol
 primeSymbol T = Id
@@ -255,10 +255,10 @@ tbl = [
   (    Hexagonal,  R2,  "2",  "",   "x,0,0", [ 1, 0, 0], "x-y,-y,-z", []),
   (    Hexagonal,  R2,  "2",  "",   "0,y,0", [ 0, 1, 0], "-x,y-x,-z", []),
   (    Hexagonal,  R2,  "2",  "",  "x,-x,0", [ 1,-1, 0],  "-y,-x,-z", []),
-  -- 
+--
   (    Hexagonal,  R2,  "2",  "",  "x,2x,0", [ 1, 2, 0],  "y-x,y,-z", []),
   (    Hexagonal,  R2,  "2",  "",  "2x,x,0", [ 2, 1, 0],  "x,x-y,-z", []),
-  -- 
+-- 
   (    Hexagonal, Inv, "-1",  "",   "0,0,0",         [],  "-x,-y,-z", []),
   (    Hexagonal, RI3, "-3", "+",   "0,0,z", [ 0, 0, 1],  "y,y-x,-z", []),
   (    Hexagonal, RI3, "-3", "-",   "0,0,z", [ 0, 0, 1],  "x-y,x,-z", []),
@@ -278,8 +278,8 @@ tbl = [
   (    Hexagonal,   M,  "m",  "",   "x,x,z", [ 1,-1, 0],     "y,x,z", []),
   (    Hexagonal,   M,  "m",  "",   "x,0,z", [ 1, 2, 0],  "x-y,-y,z", []),
   (    Hexagonal,   M,  "m",  "",   "0,y,z", [ 2, 1, 0],  "-x,y-x,z", [])
-  -- Notice
-  -- Hexagonal用のテーブルが、HexagonalのITで出現する対称操作全てをカバーしているわけではないことに注意
-  -- hexagonalでのlookup時には、hexagonal部分が優先となるよう、順番をいれかえている
-  -- それ以外のケースでは除外している
+-- Notice
+-- Hexagonal用のテーブルが、HexagonalのITで出現する対称操作全てをカバーしているわけではないことに注意
+-- hexagonalでのlookup時には、hexagonal部分が優先となるよう、順番をいれかえている
+-- それ以外のケースでは除外している
   ]
