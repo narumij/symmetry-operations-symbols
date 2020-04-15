@@ -5,20 +5,20 @@ module Data.Matrix.SymmetryOperationsSymbols.Symbol (
 import Control.Monad
 
 data Symbol
-   = Id -- '1'
-   | T -- t
+   = Id  --  '1'
+   | T   --   t
    | Inv -- '-1'
-   | M -- 'm'
-   | A -- a
-   | B -- b
-   | C -- c
-   | D -- d
-   | G -- g
-   | N -- n
-   | R2  -- '2'
-   | R3  -- '3'
-   | R4  -- '4'
-   | R6  -- '6'
+   | M   --  'm'
+   | A   --   a
+   | B   --   b
+   | C   --   c
+   | D   --   d
+   | G   --   g
+   | N   --   n
+   | R2  --  '2'
+   | R3  --  '3'
+   | R4  --  '4'
+   | R6  --  '6'
    | RI3 -- '-3'
    | RI4 -- '-4'
    | RI6 -- '-6'
