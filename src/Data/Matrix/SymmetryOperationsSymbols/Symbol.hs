@@ -28,10 +28,23 @@ instance Read Symbol where
   readsPrec _ = join . sequence readSymbols
     where
       readSymbols = [
-        readId, readT,
-        readM, readA, readB, readC, readD, readG, readN,
-        readR2, readR3, readR4, readR6,
-        readInv, readRI3, readRI4, readRI6
+        \n -> [ ( Id,st) | ("1",st) <- lex n ],
+        \n -> [ (  T,st) | ("t",st) <- lex n ],
+        \n -> [ (  M,st) | ("m",st) <- lex n ],
+        \n -> [ (  A,st) | ("a",st) <- lex n ],
+        \n -> [ (  B,st) | ("b",st) <- lex n ],
+        \n -> [ (  C,st) | ("c",st) <- lex n ],
+        \n -> [ (  D,st) | ("d",st) <- lex n ],
+        \n -> [ (  G,st) | ("g",st) <- lex n ],
+        \n -> [ (  N,st) | ("n",st) <- lex n ],
+        \n -> [ ( R2,st) | ("2",st) <- lex n ],
+        \n -> [ ( R3,st) | ("3",st) <- lex n ],
+        \n -> [ ( R4,st) | ("4",st) <- lex n ],
+        \n -> [ ( R6,st) | ("6",st) <- lex n ],
+        \n -> [ (Inv,st) | ("-",nn) <- lex n, ("1",st) <- lex nn ],
+        \n -> [ (RI3,st) | ("-",nn) <- lex n, ("3",st) <- lex nn ],
+        \n -> [ (RI4,st) | ("-",nn) <- lex n, ("4",st) <- lex nn ],
+        \n -> [ (RI6,st) | ("-",nn) <- lex n, ("6",st) <- lex nn ]
         ]
                                               
 fromSymbol :: Symbol -> String
@@ -53,75 +66,4 @@ fromSymbol RI3 = "-3"
 fromSymbol RI4 = "-4"
 fromSymbol RI6 = "-6"
 
-readId n = do
-  ("1",st) <- lex n
-  return (Id,st)
-
-readT n = do
-  ("t",st) <- lex n
-  return (T,st)
-  
-readInv n = do
-  ("-",nn) <- lex n
-  ("1",st) <- lex nn
-  return (Inv,st)
-
-readM n = do
-  ("m",st) <- lex n
-  return (M,st)
-
-readA n = do
-  ("a",st) <- lex n
-  return (A,st)
-
-readB n = do
-  ("b",st) <- lex n
-  return (B,st)
-
-readC n = do
-  ("c",st) <- lex n
-  return (C,st)
-
-readD n = do
-  ("d",st) <- lex n
-  return (D,st)
-
-readG n = do
-  ("g",st) <- lex n
-  return (G,st)
-
-readN n = do
-  ("n",st) <- lex n
-  return (N,st)
-
-readR2 n = do
-  ("2",st) <- lex n
-  return (R2,st)
-
-readR3 n = do
-  ("3",st) <- lex n
-  return (R3,st)
-
-readR4 n = do
-  ("4",st) <- lex n
-  return (R4,st)
-
-readR6 n = do
-  ("6",st) <- lex n
-  return (R6,st)
-
-readRI3 n = do
-  ("-",nn) <- lex n
-  ("3",st) <- lex nn
-  return (RI3,st)
-  
-readRI4 n = do
-  ("-",nn) <- lex n
-  ("4",st) <- lex nn
-  return (RI4,st)
-  
-readRI6 n = do
-  ("-",nn) <- lex n
-  ("6",st) <- lex nn
-  return (RI6,st)
 
