@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 {-|
 Module      : SymmetryOperationsSymbols
 Copyright   : (c) Jun Narumi, 2018
@@ -44,6 +46,11 @@ import Data.Matrix.SymmetryOperationsSymbols.Calc
 -- for doctest
 import Data.Matrix.AsXYZ
 
+import qualified Control.Monad.Fail as Fail
+
+instance Fail.MonadFail (Either String) where
+  fail = Left
+
 -- | Derivation of geometric representation of symmetry operations from given matrix of symmetry operations
 --
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
@@ -63,14 +70,14 @@ fromMatrix = fromMatrix'
 --
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
-fromMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m String
+fromMatrix' :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m String
 fromMatrix' m = showSymmetryOperation <$> fromMatrix'' m
 
 -- | Derivation of geometric representation of symmetry operations from given matrix of symmetry operations
 --
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
-fromMatrix'' :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+fromMatrix'' :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
 fromMatrix'' m
   -- (i)
   | rotPart m == identity 3             = unitMatrixCase m
