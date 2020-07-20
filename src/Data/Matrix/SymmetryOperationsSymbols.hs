@@ -46,16 +46,14 @@ import Data.Matrix.SymmetryOperationsSymbols.Calc
 -- for doctest
 import Data.Matrix.AsXYZ
 
+#if !MIN_VERSION_GLASGOW_HASKELL(8,8,0,0)
 import Control.Monad.Fail (MonadFail)
-
-#if MIN_VERSION_base(4,11,0)
-import qualified Control.Monad.Fail as Fail
 #endif
 
-#if MIN_VERSION_base(4,11,0)
+import qualified Control.Monad.Fail as Fail
+
 instance Fail.MonadFail (Either String) where
   fail = Left
-#endif
 
 -- | Derivation of geometric representation of symmetry operations from given matrix of symmetry operations
 --
