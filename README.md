@@ -4,29 +4,39 @@ Haskell Derivation of symbols and coordinate triplets Library
 
 ## Quickstart
 
+Make new stack project and move to project directory.
+
+```shell
+% stack new symop_repl
+% cd symop_repl
+```
+
+Edit extra-deps part of stack.yaml like below.
+
+```
+extra-deps:
+- matrix-as-xyz-0.1.1.1
+- symmetry-operations-symbols-0.0.1.0
+```
+
 ```shell
 % stack repl
 ```
 
 ```haskell
 -- prepare
-repl> :set -package matrix-as-xyz
-repl> :m Data.Matrix.AsXYZ
-repl> :l Data.Matrix.SymmetryOperationsSymbols
-
--- print
+repl> :set -package hall-symbols
+repl> :set -package symmetry-operations-symbols
+repl> :m Data.Matrix.AsXYZ Data.Matrix.SymmetryOperationsSymbols
+```
+```haskell
 repl> fromMatrix' . fromXYZ $ "x,y,z"
-
 " 1 "
 
--- print 
 repl> fromMatrix' . fromXYZ $ "-x,-y,z"
-
 " 2  0,0,z"
 
--- print
 repl> fromMatrix' . fromXYZ $ "-y,-x+1/2,z"
-
 " g (-1/4,1/4,0) x+1/4,-x,z"
 
 ```
