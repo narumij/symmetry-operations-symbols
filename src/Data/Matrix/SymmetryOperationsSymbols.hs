@@ -86,10 +86,7 @@ fromMatrix'' m
   tr  = trace (rotPart m)
   det = detLU (rotPart m)
 
-  
--- 11.2.2. Derivation of coordinate triplets from symbols for symmetry operations
-
--- | Derivation of matrix representation from a string of geometric representations of symmetric operations
+  -- | Derivation of matrix representation from a string of geometric representations of symmetric operations
 -- for cubic, tetragonal, orthorhombic, monoclinic, triclinic or rhombohedral.
 --
 -- jpn) 対称操作の幾何的表現の文字列から行列表現の導出
