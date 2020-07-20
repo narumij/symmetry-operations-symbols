@@ -26,7 +26,7 @@ import Data.Matrix.AsXYZ
 import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
 
 -- | Case (ii) (a) W corresponds to a rotoinversion
-nFoldRotationCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+nFoldRotationCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
 nFoldRotationCase m = arrange m <$> solvingEquation m
 
 arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> SymmetryOperation a
@@ -96,7 +96,7 @@ solvingEquation'' mat = do
   sol <- solvingEquation' mat
   adjustAnswerOnAxis mat (toList sol)
 
-solvingEquation :: (Monad m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+solvingEquation :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
 solvingEquation mat = case solvingEquation'' mat of
   Nothing -> fail "<Rot> when calculate equation."
   Just a -> return a

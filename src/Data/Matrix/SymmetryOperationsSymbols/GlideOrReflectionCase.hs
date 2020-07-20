@@ -28,7 +28,7 @@ import Data.Matrix.AsXYZ
 import qualified Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation as S
 
 -- | Case (ii) (c) W corresponds to a (glide) reflection
-glideOrReflectionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
+glideOrReflectionCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
 glideOrReflectionCase m = arrange m <$> solvingEquation m
 
 arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> S.SymmetryOperation a
@@ -74,7 +74,7 @@ solvingEquation' mat = solve (iw mat) (wl mat)
 solvingEquation'' :: Integral a => Matrix (Ratio a) -> Maybe [Ratio a]
 solvingEquation'' mat = adjustAnswerOnPlane mat . toList =<< solvingEquation' mat
 
-solvingEquation :: (Monad m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+solvingEquation :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
 solvingEquation mat = case solvingEquation'' mat of
   Nothing -> fail "<GlideOrReflection> when calculate equation solve."
   Just a -> return a
