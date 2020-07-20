@@ -6,11 +6,13 @@ Maintainer  : narumij@gmail.com
 Stability   : experimental
 Portability : ?
 
+Haskell Derivation of symbols and coordinate triplets Library
+
 [References]
 
-W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
+1. W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
 
-listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
+2. Wondratschek, H. & Neubu ̈ser, J. (1967). Determination of the symmetry elements of a space group from the ‘general positions’ listed in International Tables for X-ray Crystallography, Vol. I. Acta Cryst. 23, 349–352.
 
 -}
 
@@ -36,11 +38,15 @@ import Data.Matrix.SymmetryOperationsSymbols.RotInversionCase
 
 import Data.Matrix.SymmetryOperationsSymbols.Parser
 import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation -- (SymmetryOperation)
+import Data.Matrix.SymmetryOperationsSymbols.Calc
+
 
 -- for doctest
 import Data.Matrix.AsXYZ
 
--- | 与えられた対称操作の行列から、対称操作の幾何的表現を導出します。
+-- | Derivation of geometric representation of symmetry operations from given matrix of symmetry operations
+--
+-- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
 -- >>> fromMatrix . fromXYZ $ "x,y,z"
 -- Right " 1 "
@@ -53,9 +59,17 @@ fromMatrix :: Integral a =>
            -> Either String String
 fromMatrix = fromMatrix'
 
+-- | Derivation of geometric representation of symmetry operations from given matrix of symmetry operations
+--
+-- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
+--
 fromMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m String
 fromMatrix' m = showSymmetryOperation <$> fromMatrix'' m
 
+-- | Derivation of geometric representation of symmetry operations from given matrix of symmetry operations
+--
+-- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
+--
 fromMatrix'' :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
 fromMatrix'' m
   -- (i)
@@ -72,33 +86,10 @@ fromMatrix'' m
   tr  = trace (rotPart m)
   det = detLU (rotPart m)
 
-type Trace a = Ratio a
-type Determinant a = Ratio a
-
--- Table 11.2.1.1. Identification of the type of the rotation part of the symmetry operation
-correpondToRotInversion :: Integral a => Trace a -> Determinant a -> Bool
-correpondToRotInversion (-3) (-1) = True -- -1
-correpondToRotInversion (-2) (-1) = True -- -6
-correpondToRotInversion (-1) (-1) = True -- -4
-correpondToRotInversion   0  (-1) = True -- -3
-correpondToRotInversion   _    _  = False
-
-correpondToNFoldRotation :: Integral a => Trace a -> Determinant a -> Bool
-correpondToNFoldRotation (-1) 1 = True -- 2
-correpondToNFoldRotation   0  1 = True -- 3
-correpondToNFoldRotation   1  1 = True -- 4
-correpondToNFoldRotation   2  1 = True -- 6
-correpondToNFoldRotation   _  _ = False
-
-correpondToGlideOrReflection :: Integral a => Trace a -> Determinant a -> Bool
-correpondToGlideOrReflection 1 (-1) = True -- m
-correpondToGlideOrReflection _   _  = False
-
--- 11.2.2. Derivation of coordinate triplets from symbols for symmetry operations
-
--- | 対称操作の幾何的表現の文字列から行列表現の導出
---
+  -- | Derivation of matrix representation from a string of geometric representations of symmetric operations
 -- for cubic, tetragonal, orthorhombic, monoclinic, triclinic or rhombohedral.
+--
+-- jpn) 対称操作の幾何的表現の文字列から行列表現の導出
 --
 -- >>> prettyXYZ <$> toMatrixHex "-4- 0,0,z; 0,0,0"
 -- Right "-y,x,-z"
@@ -108,9 +99,10 @@ toMatrix :: Integral a =>
          -> Either ParseError (Matrix (Ratio a)) -- ^ 3x4 Matrix
 toMatrix st = parse notHexagonal st st
 
--- | 対称操作の幾何的表現の文字列から行列表現の導出
---
+-- | Derivation of matrix representation from a string of geometric representations of symmetric operations
 -- for hexagonal.
+--
+-- jpn) 対称操作の幾何的表現の文字列から行列表現の導出(六方晶用)
 --
 -- >>> prettyXYZ <$> toMatrixHex "-3+ 0,0,z; 0,0,0"
 -- Right "y,y-x,-z"
