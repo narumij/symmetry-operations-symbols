@@ -25,12 +25,17 @@ Then start repl.
 % stack repl
 ```
 
+Setup packages and load modules.
+
 ```haskell
 -- prepare
 repl> :set -package hall-symbols
 repl> :set -package symmetry-operations-symbols
 repl> :m Data.Matrix.AsXYZ Data.Matrix.SymmetryOperationsSymbols
 ```
+
+Use like below.
+
 ```haskell
 repl> fromMatrix' . fromXYZ $ "x,y,z"
 " 1 "
@@ -40,7 +45,6 @@ repl> fromMatrix' . fromXYZ $ "-x,-y,z"
 
 repl> fromMatrix' . fromXYZ $ "-y,-x+1/2,z"
 " g (-1/4,1/4,0) x+1/4,-x,z"
-
 ```
 
 ## References
