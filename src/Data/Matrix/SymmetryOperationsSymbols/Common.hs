@@ -42,6 +42,8 @@ import Data.Ratio.Slash
 
 import Data.Matrix.SymmetryOperationsSymbols.Symbol
 
+import Control.Monad.Fail (MonadFail)
+
 type ErrorMessage = String
 type SymbolSenseVectorOrientation = (Symbol,String,String,String)
 

@@ -25,6 +25,8 @@ import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
 import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
 
+import Control.Monad.Fail (MonadFail)
+
 -- | Case (ii) (a) W corresponds to a rotoinversion
 nFoldRotationCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
 nFoldRotationCase m = arrange m <$> solvingEquation m
