@@ -27,6 +27,8 @@ import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
 import qualified Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation as S
 
+import Control.Monad.Fail (MonadFail)
+
 -- | Case (ii) (c) W corresponds to a (glide) reflection
 glideOrReflectionCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
 glideOrReflectionCase m = arrange m <$> solvingEquation m
