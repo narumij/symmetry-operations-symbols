@@ -7,8 +7,8 @@ Haskell Derivation of symbols and coordinate triplets Library
 Make new stack project and move to project directory.
 
 ```shell
-% stack new symop_repl
-% cd symop_repl
+% stack new symopRepl
+% cd symopRepl
 ```
 
 Edit extra-deps part of stack.yaml like below.
