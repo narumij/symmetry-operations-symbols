@@ -74,7 +74,7 @@ rotPart = submatrix 1 3 1 3
 transPart :: Matrix a -> Matrix a
 transPart = submatrix 1 3 4 4
 
--- | 解を解直線上で補正
+-- | jpn) 解を解直線上で補正
 adjustAnswerOnAxis :: (Eq b, Fractional b, Integral a) =>  Matrix (Ratio a) -> [b] -> Maybe [b]
 adjustAnswerOnAxis mat ans = do
   let basis = axisOf mat
@@ -131,11 +131,11 @@ sense (_,_,_,s,_,_,_,_) = s
 location (_,_,_,_,o,_,_,_) = rotPart . fromXYZ'' $ o
 orientation (a,s,b,c,d,e,f,g) = fmap fromIntegral e
 
--- | 入力文字列が空だった場合に、4x4の0行列を返す
+-- | jpn) 入力文字列が空だった場合に、4x4の0行列を返す
 fromXYZ'' s = fromMaybe (zero 4 4) (fromXYZ' s)
 
--- | 入力の行列に該当するレコードを返却する
--- 行列の内容に対して一意なので、hexagonalを区別する必要がない
+-- | jpn) 入力の行列に該当するレコードを返却する
+-- jpn) 行列の内容に対して一意なので、hexagonalを区別する必要がない
 searchByRotationPart m = lookup (rotPart m) d
   where
     d = map (\i@(a,s,b,c,d,e,f,g)->(rotPart . fromXYZ'' $ f,i)) tbl

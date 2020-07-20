@@ -43,7 +43,7 @@ solve' mat vec = do
     permutation n v = toList (multStd n (fromList (length v) 1 v))
 
 solve :: (Integral a) =>
-         Matrix (Ratio a) -- ^ 正方行列
-      -> Matrix (Ratio a) -- ^ ベクトル
+         Matrix (Ratio a) -- ^ jpn) 正方行列
+      -> Matrix (Ratio a) -- ^ jpn) ベクトル
       -> Maybe (Matrix (Ratio a))
 solve mat vec = fromList (nrows vec) (ncols vec) <$> solve' mat (toList vec)
