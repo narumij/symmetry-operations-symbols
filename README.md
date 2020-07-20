@@ -27,5 +27,5 @@ repl> fromMatrix' . fromXYZ $ "-x,-y,z"
 
 ## License
 
-See the [LICENSE](https://github.com/narumij/symmetry-operations-symbols/LICENSE)
+See the [LICENSE](https://raw.githubusercontent.com/narumij/symmetry-operations-symbols/master/LICENSE)
 file in the repository.
