@@ -6,6 +6,8 @@ Maintainer  : narumij@gmail.com
 Stability   : experimental
 Portability : ?
 
+Haskell Derivation of symbols and coordinate triplets Library
+
 [References]
 
 1. W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
