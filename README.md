@@ -19,6 +19,8 @@ extra-deps:
 - symmetry-operations-symbols-0.0.1.0
 ```
 
+Then start repl.
+
 ```shell
 % stack repl
 ```
