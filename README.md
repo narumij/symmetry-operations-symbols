@@ -23,6 +23,12 @@ repl> fromMatrix' . fromXYZ $ "x,y,z"
 repl> fromMatrix' . fromXYZ $ "-x,-y,z"
 
 " 2  0,0,z"
+
+-- print
+repl> fromMatrix' . fromXYZ $ "y,z,x+1/2"
+
+" 3-(1/6,1/6,1/6) x-1/3,x-1/6,x"
+
 ```
 
 ## References
