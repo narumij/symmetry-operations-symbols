@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 {-|
 Module      : Common
 Description : utilities
@@ -42,7 +44,9 @@ import Data.Ratio.Slash
 
 import Data.Matrix.SymmetryOperationsSymbols.Symbol
 
+#if MIN_VERSION_base(4,11,0)
 import Control.Monad.Fail (MonadFail)
+#endif
 
 type ErrorMessage = String
 type SymbolSenseVectorOrientation = (Symbol,String,String,String)
@@ -144,19 +148,26 @@ searchByRotationPart m = lookup (rotPart m) d
 
 type MatrixLookupRecord a = ((Symbol,Sense,Matrix (Ratio a)),TransformedCoordinate)
 
-lookupMatrixM :: (Monad m, MonadFail m) => Integral a => String -> [MatrixLookupRecord a] -> SymbolSenseVectorOrientation -> m TransformedCoordinate
+lookupSSVO :: (Integral a) => (Symbol,String,String) -> [MatrixLookupRecord a] -> Maybe TransformedCoordinate
+lookupSSVO (sym, sen, axis) d = lookup (sym, sen, rotPart . fromXYZ'' $ axis) d
+
+#if MIN_VERSION_base(4,11,0)
+lookupMatrixM :: (Monad m,MonadFail m) => Integral a => String -> [MatrixLookupRecord a] -> SymbolSenseVectorOrientation -> m TransformedCoordinate
+properMatrixW :: (Monad m,MonadFail m) => SymbolSenseVectorOrientation -> m TransformedCoordinate
+hexagonalMatrixW :: (Monad m,MonadFail m) => SymbolSenseVectorOrientation -> m TransformedCoordinate
+#else
+lookupMatrixM :: (Monad m) => Integral a => String -> [MatrixLookupRecord a] -> SymbolSenseVectorOrientation -> m TransformedCoordinate
+properMatrixW :: (Monad m) => SymbolSenseVectorOrientation -> m TransformedCoordinate
+hexagonalMatrixW :: (Monad m) => SymbolSenseVectorOrientation -> m TransformedCoordinate
+#endif
+
 lookupMatrixM reason dataTable (sy,se,_,el)
    = case lookupSSVO (primeSymbol sy, se, el) dataTable of
       Nothing -> fail reason
       Just c  -> return c
 
-lookupSSVO :: (Integral a) => (Symbol,String,String) -> [MatrixLookupRecord a] -> Maybe TransformedCoordinate
-lookupSSVO (sym, sen, axis) d = lookup (sym, sen, rotPart . fromXYZ'' $ axis) d
-
-properMatrixW :: (Monad m, MonadFail m) => SymbolSenseVectorOrientation -> m TransformedCoordinate
 properMatrixW = lookupMatrixM "matrix W not found (proper)." (fromTbl properTbl)
 
-hexagonalMatrixW :: (Monad m, MonadFail m) => SymbolSenseVectorOrientation -> m TransformedCoordinate
 hexagonalMatrixW = lookupMatrixM "matrix W not found (hexagonal)." (fromTbl hexagonalTbl)
 
 fromTbl :: (Integral a) => [Tbl] -> [MatrixLookupRecord a]

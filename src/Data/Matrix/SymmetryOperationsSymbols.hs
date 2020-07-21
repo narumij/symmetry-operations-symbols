@@ -46,14 +46,16 @@ import Data.Matrix.SymmetryOperationsSymbols.Calc
 -- for doctest
 import Data.Matrix.AsXYZ
 
-#if !MIN_VERSION_GLASGOW_HASKELL(8,8,0,0)
+#if MIN_VERSION_base(4,11,0)
 import Control.Monad.Fail (MonadFail)
 #endif
 
+#if MIN_VERSION_base(4,11,0)
 import qualified Control.Monad.Fail as Fail
 
 instance Fail.MonadFail (Either String) where
   fail = Left
+#endif
 
 -- | Derivation of geometric representation of symmetry operations from given matrix of symmetry operations
 --
@@ -74,14 +76,22 @@ fromMatrix = fromMatrix'
 --
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
+#if MIN_VERSION_base(4,11,0)
 fromMatrix' :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m String
+#else
+fromMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m String
+#endif
 fromMatrix' m = showSymmetryOperation <$> fromMatrix'' m
 
 -- | Derivation of geometric representation of symmetry operations from given matrix of symmetry operations
 --
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
+#if MIN_VERSION_base(4,11,0)
 fromMatrix'' :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+#else
+fromMatrix'' :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+#endif
 fromMatrix'' m
   -- (i)
   | rotPart m == identity 3             = unitMatrixCase m

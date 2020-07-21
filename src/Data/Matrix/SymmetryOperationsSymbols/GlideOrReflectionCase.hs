@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 {-|
 Module      : GlideOrReflectionCase
 Copyright   : (c) Jun Narumi, 2018
@@ -27,10 +29,16 @@ import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
 import qualified Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation as S
 
+#if MIN_VERSION_base(4,11,0)
 import Control.Monad.Fail (MonadFail)
+#endif
 
 -- | Case (ii) (c) W corresponds to a (glide) reflection
+#if MIN_VERSION_base(4,11,0)
 glideOrReflectionCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
+#else
+glideOrReflectionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
+#endif
 glideOrReflectionCase m = arrange m <$> solvingEquation m
 
 arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> S.SymmetryOperation a
@@ -76,7 +84,11 @@ solvingEquation' mat = solve (iw mat) (wl mat)
 solvingEquation'' :: Integral a => Matrix (Ratio a) -> Maybe [Ratio a]
 solvingEquation'' mat = adjustAnswerOnPlane mat . toList =<< solvingEquation' mat
 
+#if MIN_VERSION_base(4,11,0)
 solvingEquation :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+#else
+solvingEquation :: (Monad m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+#endif
 solvingEquation mat = case solvingEquation'' mat of
   Nothing -> fail "<GlideOrReflection> when calculate equation solve."
   Just a -> return a

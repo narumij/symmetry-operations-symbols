@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 {-|
 Module      : RotInversionCase
 Copyright   : (c) Jun Narumi, 2018
@@ -26,13 +28,23 @@ import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
 import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
 
+#if MIN_VERSION_base(4,11,0)
 import Control.Monad.Fail (MonadFail)
+#endif
 
 -- | Case (ii) (b) W corresponds to an n-fold rotation
+#if MIN_VERSION_base(4,11,0)
 rotInversionCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+#else
+rotInversionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+#endif
 rotInversionCase m = arrange m <$> calc m
 
-calc :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m ([Ratio a], Matrix (Ratio a))    
+#if MIN_VERSION_base(4,11,0)
+calc :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m ([Ratio a], Matrix (Ratio a))
+#else
+calc :: (Monad m, Integral a) => Matrix (Ratio a) -> m ([Ratio a], Matrix (Ratio a))
+#endif
 calc m = (,) <$> solvingEquation2 m <*> solvingEquation1 m
 
 arrange :: Integral a => Matrix (Ratio a) -> ([Ratio a], Matrix (Ratio a)) -> SymmetryOperation a
@@ -76,7 +88,11 @@ wl :: (Fractional b, Eq b) => Matrix b -> Matrix b
 wl mat = elementwise (+) (wg mat) (transPart mat)
 
 -- (ii) (a) solving equation (W,w)x = x
+#if MIN_VERSION_base(4,11,0)
 solvingEquation1 :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (Matrix (Ratio a))
+#else
+solvingEquation1 :: (Monad m, Integral a) => Matrix (Ratio a) -> m (Matrix (Ratio a))
+#endif
 solvingEquation1 mat = case solvingEquation1' mat of
   Nothing -> fail "<RotInv> when calculate equation (W,w)x = x"
   Just a -> return a
@@ -91,7 +107,11 @@ solvingEquation2' mat = solve (iw w2) (wl mat)
     pow2 m = multStd m m
     w2 = pow2 (rotPart mat)
 
+#if MIN_VERSION_base(4,11,0)
 solvingEquation2 :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+#else
+solvingEquation2 :: (Monad m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+#endif
 solvingEquation2 mat = case result of
     Nothing -> fail "<RotInv> when calculate equation (W,w)^2 x = x."
     Just a -> return a
