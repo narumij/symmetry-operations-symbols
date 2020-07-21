@@ -19,6 +19,15 @@ extra-deps:
 - symmetry-operations-symbols-0.0.1.3
 ```
 
+Edit dependencies part of package.yaml like below.
+
+```
+dependencies:
+- base >= 4.7 && < 5
+- matrix-as-xyz
+- symmetry-operations-symbols
+```
+
 Then start repl.
 
 ```shell
@@ -28,9 +37,6 @@ Then start repl.
 Setup packages and load modules.
 
 ```haskell
--- prepare
-repl> :set -package hall-symbols
-repl> :set -package symmetry-operations-symbols
 repl> :m Data.Matrix.AsXYZ Data.Matrix.SymmetryOperationsSymbols
 ```
 
