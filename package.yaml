@@ -1,5 +1,5 @@
 name:                symmetry-operations-symbols
-version:             0.0.1.2
+version:             0.0.1.3
 github:              "narumij/symmetry-operations-symbols"
 license:             BSD3
 author:              "Jun Narumi"
@@ -11,8 +11,8 @@ extra-source-files:
 - ChangeLog.md
 
 # Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            Chemistry
+synopsis:            Derivation of symbols and coordinate triplets Library
+category:            Chemistry
 
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is

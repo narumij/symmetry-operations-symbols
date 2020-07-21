@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 {-|
 Module      : RotationCase
 Copyright   : (c) Jun Narumi, 2018
@@ -25,10 +27,16 @@ import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
 import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
 
+#if MIN_VERSION_base(4,11,0)
 import Control.Monad.Fail (MonadFail)
+#endif
 
 -- | Case (ii) (a) W corresponds to a rotoinversion
+#if MIN_VERSION_base(4,11,0)
 nFoldRotationCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+#else
+nFoldRotationCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+#endif
 nFoldRotationCase m = arrange m <$> solvingEquation m
 
 arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> SymmetryOperation a
@@ -98,7 +106,11 @@ solvingEquation'' mat = do
   sol <- solvingEquation' mat
   adjustAnswerOnAxis mat (toList sol)
 
+#if MIN_VERSION_base(4,11,0)
 solvingEquation :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+#else
+solvingEquation :: (Monad m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+#endif
 solvingEquation mat = case solvingEquation'' mat of
   Nothing -> fail "<Rot> when calculate equation."
   Just a -> return a
