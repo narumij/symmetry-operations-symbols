@@ -1,5 +1,5 @@
 name:                symmetry-operations-symbols
-version:             0.0.1.3
+version:             0.0.1.4
 github:              "narumij/symmetry-operations-symbols"
 license:             BSD3
 author:              "Jun Narumi"
@@ -8,7 +8,7 @@ copyright:           "Jun Narumi"
 
 extra-source-files:
 - README.md
-- ChangeLog.md
+# - ChangeLog.md
 
 # Metadata used when publishing your package
 synopsis:            Derivation of symbols and coordinate triplets Library
@@ -20,17 +20,16 @@ category:            Chemistry
 description:         Please see the README on GitHub at <https://github.com/narumij/symmetry-operations-symbols#readme>
 
 dependencies:
-- base >= 4.7 && < 5
-- matrix
-- parsec
+- base >= 4.8 && < 5
+- parsec >= 3.1 && < 4
+- matrix >= 0.3.5 && < 4
 - matrix-as-xyz >= 0.1 && < 1
-# - doctest
 
 library:
   source-dirs: src
 
 tests:
-  symmetry-operations-symbols-test:
+  spec-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -41,7 +40,8 @@ tests:
     - symmetry-operations-symbols
     - hspec
     - QuickCheck
-  symmetry-operations-symbols-doctest:
+
+  doctest:
     main:                test/doctests.hs
     ghc-options:
     - -threaded
