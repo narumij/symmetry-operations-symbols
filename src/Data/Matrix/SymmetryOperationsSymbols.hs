@@ -48,9 +48,7 @@ import Data.Matrix.AsXYZ
 
 #if MIN_VERSION_base(4,11,0)
 import Control.Monad.Fail (MonadFail)
-#endif
 
-#if MIN_VERSION_base(4,11,0)
 import qualified Control.Monad.Fail as Fail
 
 instance Fail.MonadFail (Either String) where
