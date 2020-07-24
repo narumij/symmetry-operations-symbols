@@ -1,5 +1,9 @@
 # symmetry-operations-symbols
 
+[![Continuous Integration status][status-png]][status]
+[![Hackage page (downloads and API reference)][hackage-png]][hackage]
+[![Hackage-Deps][hackage-deps-png]][hackage-deps]
+
 Haskell Derivation of symbols and coordinate triplets Library
 
 ## Quickstart
@@ -63,3 +67,11 @@ repl> fromMatrix' . fromXYZ $ "-y,-x+1/2,z"
 
 See the [LICENSE](https://raw.githubusercontent.com/narumij/symmetry-operations-symbols/master/LICENSE)
 file in the repository.
+
+ [hackage]: http://hackage.haskell.org/package/symmetry-operations-symbols
+ [hackage-png]: http://img.shields.io/hackage/v/symmetry-operations-symbols.svg
+ [hackage-deps]: http://packdeps.haskellers.com/reverse/symmetry-operations-symbols
+ [hackage-deps-png]: https://img.shields.io/hackage-deps/v/symmetry-operations-symbols.svg
+
+ [status]: http://travis-ci.org/narumij/symmetry-operations-symbols?branch=master
+ [status-png]: https://api.travis-ci.org/narumij/symmetry-operations-symbols.svg?branch=master
