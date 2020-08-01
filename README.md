@@ -14,7 +14,7 @@ Make new stack project and move to project directory.
 Edit resolver part of stack.yaml like below.
 
 ```
-resolver: lts-16.7
+resolver: lts-16.8
 ```
 
 Edit dependencies part of package.yaml like below.
