@@ -11,12 +11,10 @@ Make new stack project and move to project directory.
 % cd symopRepl
 ```
 
-Edit extra-deps part of stack.yaml like below.
+Edit resolver part of stack.yaml like below.
 
 ```
-extra-deps:
-- matrix-as-xyz-0.1.1.3
-- symmetry-operations-symbols-0.0.1.4
+resolver: lts-16.7
 ```
 
 Edit dependencies part of package.yaml like below.
@@ -24,8 +22,8 @@ Edit dependencies part of package.yaml like below.
 ```
 dependencies:
 - base >= 4.7 && < 5
-- matrix-as-xyz
-- symmetry-operations-symbols
+- matrix-as-xyz >= 0.1.1 && < 2
+- symmetry-operations-symbols >= 0.0 && < 0.1
 ```
 
 Then start repl.
