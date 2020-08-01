@@ -77,37 +77,46 @@ showSymmetryOperation val@RotInversion {}
 
 data TexPart = Str String deriving Show
 
+label :: String -> String
+label l = "\\" ++ l
+
+curly :: String -> String
+curly a = "{" ++ a ++ "}"
+
+bar :: String -> String
+bar a = label "overline" ++ curly a
+
 texSymmetryOperation :: Integral a => SymmetryOperation a -> [TexPart]
 
 texSymmetryOperation Identity = [Str "1"]
 
 texSymmetryOperation val@Translation {}
-  = [Str $ concat [" t ",tripletParen $ vector val," "]]
+  = [Str $ concat ["t", tripletParen $ vector val," "]]
 
 texSymmetryOperation val@Reflection {}
-  = [Str $ concat [" m  ",prettyXYZ $ plane val]]
+  = [Str $ concat ["m", prettyXYZ $ plane val]]
 
 texSymmetryOperation val@GlideABC {}
-  = [Str $ concat [" ",showABC $ abc val,"  ",prettyXYZ $ plane val]]
+  = [Str $ concat [showABC $ abc val,"  ",prettyXYZ $ plane val]]
 
 texSymmetryOperation val@GlideDGN {}
-  = [Str $ concat [" ",showDGN $ dgn val," ",tripletParen $ glide val," ",prettyXYZ $ plane val]]
+  = [Str $ concat [showDGN $ dgn val," ",tripletParen $ glide val," ",prettyXYZ $ plane val]]
 
 texSymmetryOperation val@TwoFoldRotation {}
-  = [Str $ concat [" 2  ",prettyXYZ $ axis val]]
+  = [Str $ concat ["2",prettyXYZ $ axis val]]
 
 texSymmetryOperation val@TwoFoldScrew {}
-  = [Str $ concat [" 2 ",tripletParen $ vector val," ",prettyXYZ $ axis val]]
+  = [Str $ concat ["2",tripletParen $ vector val," ",prettyXYZ $ axis val]]
 
 texSymmetryOperation val@NFoldRotation {}
-  = [Str $ concat [" ",showSymbol (nFold val),showSense (sense val)," ",prettyXYZ $ axis val]]
+  = [Str $ concat [showSymbol (nFold val),showSense (sense val)," ",prettyXYZ $ axis val]]
 
 texSymmetryOperation val@NFoldScrew {}
-  = [Str $ concat [" ",showSymbol (nFold val),showSense (sense val),tripletParen $ vector val," ",prettyXYZ $ axis val]]
+  = [Str $ concat [showSymbol (nFold val),showSense (sense val),tripletParen $ vector val," ",prettyXYZ $ axis val]]
 
 texSymmetryOperation val@Inversion {}
-  = [Str $ concat ["-1 ",triplet $ centre val]]
+  = [Str $ concat [label "overline" ++ curly "1", triplet $ centre val]]
 
 texSymmetryOperation val@RotInversion {}
-  = [Str $ concat ["-",showSymbol (nFold val),showSense (sense val)," ",prettyXYZ $ axis val,"; ",triplet $ point val]]
+  = [Str $ concat [label "overline" ++ curly (showSymbol (nFold val)),showSense (sense val)," ",prettyXYZ $ axis val,"; ",triplet $ point val]]
 
