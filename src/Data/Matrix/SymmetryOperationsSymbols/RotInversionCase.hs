@@ -26,7 +26,8 @@ import Data.Matrix
 import Data.Matrix.SymmetryOperationsSymbols.Solve
 import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
-import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
+--import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
+import Data.Matrix.SymmetryOperationsSymbols.SymopGeom
 
 #if MIN_VERSION_base(4,11,0)
 import Control.Monad.Fail (MonadFail)
@@ -34,9 +35,9 @@ import Control.Monad.Fail (MonadFail)
 
 -- | Case (ii) (b) W corresponds to an n-fold rotation
 #if MIN_VERSION_base(4,11,0)
-rotInversionCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+--rotInversionCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
 #else
-rotInversionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+-- rotInversionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
 #endif
 rotInversionCase m = arrange m <$> calc m
 
@@ -47,7 +48,7 @@ calc :: (Monad m, Integral a) => Matrix (Ratio a) -> m ([Ratio a], Matrix (Ratio
 #endif
 calc m = (,) <$> solvingEquation2 m <*> solvingEquation1 m
 
-arrange :: Integral a => Matrix (Ratio a) -> ([Ratio a], Matrix (Ratio a)) -> SymmetryOperation a
+arrange :: Integral a => Matrix (Ratio a) -> ([Ratio a], Matrix (Ratio a)) -> SymopGeom a
 arrange m ([],b) = Inversion { centre = (i,j,k) }
   where
     [i,j,k] = toList b
@@ -55,7 +56,7 @@ arrange m (a,b) = RotInversion { nFold = n, sense = sen, axis = loc, point = (i,
   where
     [i,j,k] = toList b
     rt = rotationType m
-    loc = locationOf m <|> fromList 3 1 a
+    loc = toLists $ locationOf m <|> fromList 3 1 a
     n | rt == -3 = ThreeFold
       | rt == -4 = FourFold
       | rt == -6 = SixFold
