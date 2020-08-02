@@ -1,18 +1,35 @@
 module Data.Matrix.SymmetryOperationsSymbols.Tex where
 
-import Control.Monad (join)
-
-import Data.Ratio
-import Data.Ratio.Slash
-import Data.List
-import Data.Matrix
-import Data.Matrix.AsXYZ
+import Data.Ratio (Ratio)
+import Data.List (intercalate)
 import qualified Data.Matrix.AsXYZ.Tex as T
 import Data.Matrix.SymmetryOperationsSymbols.SymopGeom
+  (SymopGeom(Identity,Translation,Reflection,GlideABC,GlideDGN,
+      TwoFoldRotation,TwoFoldScrew,NFoldRotation,NFoldScrew,
+      Inversion,RotInversion),Sense(..))
+import qualified Data.Matrix.SymmetryOperationsSymbols.SymopGeom as S
 
-import Numeric
+make n a = concatMap ($ a) $ [begin] ++ n
+  where
+    begin _ = [T.SizeN]
 
-data TexPart = Str String | Space deriving Show
+sep a = [T.Str ";"]
+
+sp a = [T.Str "\\ "]
+
+s str _ = [T.Str str]
+
+abc = flip s () . S.showABC . S.abc
+
+dgn = flip s () . S.showDGN . S.dgn
+
+n = flip s () . S.showSymbol . S.nFold
+
+bar' n a = (:[]) . T.Str . T.label . ("overline" ++) . T.curly $ n
+
+bar n = bar' n
+
+barN = flip bar () . S.showSymbol . S.nFold
 
 texRatio :: Integral a => Ratio a -> [T.Command]
 texRatio n = [T.SizeS, T.Str . bar n . T.num $ n, T.SizeN]
@@ -20,115 +37,78 @@ texRatio n = [T.SizeS, T.Str . bar n . T.num $ n, T.SizeN]
     bar n | n < 0 = T.bar
           | otherwise = id
 
-
--- |
--- >>> triplet (1%2,3%4,5%6)
--- "1/2,3/4,5/6"
-triplet :: Integral a => (Ratio a,Ratio a,Ratio a) -> String
-triplet (a,b,c) = intercalate "," . map (show . Slash) $ [a,b,c]
-
 texTriplet :: Integral a => (Ratio a,Ratio a,Ratio a) -> [T.Command]
 texTriplet (a,b,c) = intercalate [T.Str ","] . map texRatio $ [a,b,c]
-
--- |
--- >>> triplet (1%2,3%4,5%6)
--- "(1/2,3/4,5/6)"
-tripletParen :: Integral a => (Ratio a,Ratio a,Ratio a) -> String
-tripletParen = ("(" ++) . (++ ")") . triplet
 
 texTripletParen :: Integral a => (Ratio a,Ratio a,Ratio a) -> [T.Command]
 texTripletParen = ([T.SizeN,T.Str "("] ++) . (++ [T.SizeN,T.Str ")"]) . texTriplet
 
+sense :: SymopGeom a -> [T.Command]
+sense = ([T.SizeS] ++) . (++[T.SizeN]) . sense' . S.sense
+  where
+    sense' Positive = [T.Str "^+"]
+    sense' Negative = [T.Str "^-"]
 
-showSymbol :: NFold -> String
-showSymbol ThreeFold = "3"
-showSymbol FourFold  = "4"
-showSymbol SixFold   = "6"
+vector :: Integral a => SymopGeom a -> [T.Command]
+vector = texTripletParen . S.vector
 
-texSense :: Sense -> [T.Command]
-texSense Positive = [T.Str "^+"]
-texSense Negative = [T.Str "^-"]
+plane :: Integral a => SymopGeom a -> [T.Command]
+plane = T.commands "xyz" . take 3 . S.plane
 
-texSense' = ([T.SizeS] ++) . (++[T.SizeN]) . texSense . sense
+glide :: Integral a => SymopGeom a -> [T.Command]
+glide = texTripletParen . S.glide
 
-showABC :: ABC -> String
-showABC A = "a"
-showABC B = "b"
-showABC C = "c"
+axis :: Integral a => SymopGeom a -> [T.Command]
+axis = T.commands "xyz" . take 3 . S.axis
 
-showDGN :: DGN -> String
-showDGN D = "d"
-showDGN G = "g"
-showDGN N = "n"
+centre :: Integral a => SymopGeom a -> [T.Command]
+centre = texTriplet . S.centre
 
-showVector :: Integral a => SymopGeom a -> String
-showVector = tripletParen . vector
+point :: Integral a => SymopGeom a -> [T.Command]
+point = texTriplet . S.point
 
-texVector :: Integral a => SymopGeom a -> [T.Command]
-texVector = texTripletParen . vector
-
-showPlane :: Integral a => SymopGeom a -> String
-showPlane = prettyXYZ . fromLists . plane
-
-texPlane :: Integral a => SymopGeom a -> [T.Command]
-texPlane = T.commands "xyz" . take 3 . plane
-
-showGlide :: Integral a => SymopGeom a -> String
-showGlide = tripletParen . glide
-
-texGlide :: Integral a => SymopGeom a -> [T.Command]
-texGlide = texTripletParen . glide
-
-showAxis :: Integral a => SymopGeom a -> String
-showAxis = prettyXYZ . fromLists . axis
-
-texAxis :: Integral a => SymopGeom a -> [T.Command]
-texAxis = T.commands "xyz" . take 3 . axis
-
-showPoint :: Integral a => SymopGeom a -> String
-showPoint = triplet . point
-
-texPoint :: Integral a => SymopGeom a -> [T.Command]
-texPoint = texTriplet . point
-
-texSpace :: [T.Command]
-texSpace = [T.Str "\\ "]
 
 texGeom :: Integral a => SymopGeom a -> [T.Command]
-texGeom Identity = [T.SizeN, T.Str "1"]
+texGeom Identity
+  = make [s "1"] ()
 
-texGeom val@Translation {}
-  = [T.SizeN, T.Str "t"] ++ texVector val
+texGeom t@Translation {}
+  = make [s "t",vector] t
 
-texGeom val@Reflection {}
-  = [T.SizeN, T.Str "m"] ++ texSpace ++ texPlane val
+texGeom mm@Reflection {}
+  = make [s "m", sp, plane] mm
 
-texGeom val@GlideABC {}
-  = [T.SizeN, T.Str . showABC . abc $ val] ++ texSpace ++ texPlane val
+texGeom mm@GlideABC {}
+  = make [abc, sp, plane] mm
 
-texGeom val@GlideDGN {}
-  = [T.SizeN, T.Str . showDGN . dgn $ val] ++ texGlide val ++ texSpace ++ texPlane val
+texGeom mm@GlideDGN {}
+  = make [dgn, glide, sp, plane] mm
 
-texGeom val@TwoFoldRotation {}
-  = [T.SizeN, T.Str "2"]  ++ texSpace ++ texAxis val
+texGeom rr@TwoFoldRotation {}
+  = make [s "2", sp, axis] rr
 
-texGeom val@TwoFoldScrew {}
-  = [T.SizeN, T.Str "2"] ++ texVector val ++ texSpace ++ texAxis val
+texGeom ss@TwoFoldScrew {}
+  = make [s "2", vector, sp, axis] ss
 
-texGeom val@NFoldRotation {}
-  = [T.SizeN, T.Str . showSymbol . nFold $ val] ++ texSense' val ++ texSpace ++ texAxis val
+texGeom rr@NFoldRotation {}
+  = make [n, sense, sp, axis] rr
 
-texGeom val@NFoldScrew {}
-  = [T.SizeN, T.Str . showSymbol . nFold $ val] ++ texSense' val ++ texVector val ++ texSpace ++ texAxis val
+texGeom ss@NFoldScrew {}
+  = make [n, sense, vector, sp, axis] ss
 
-texGeom val@Inversion {}
-  = [T.SizeN, T.Str $ T.label "overline" ++ T.curly "1"] ++ texSpace ++ (texTriplet . centre $ val)
+texGeom ii@Inversion {}
+  = make [bar "1", sp, centre] ii
 
-texGeom val@RotInversion {}
-  = [T.SizeN, T.Str $ T.label "overline" ++ T.curly (showSymbol (nFold val))] ++ texSense' val ++ texSpace ++ texAxis val  ++ texSpace ++ [T.Str "; "] ++ texSpace ++ texPoint val
+texGeom ii@RotInversion {}
+  = make [barN, sense, sp, axis, sp, sep, sp, point] ii
+
+toTex' :: Integral a => T.Relative -> T.Relative -> SymopGeom a -> String
+toTex' sizeN sizeS = T.renderCommand sizeN sizeS . T.reduceCommands . texGeom
 
 toTex :: Integral a => SymopGeom a -> String
-toTex = T.renderCommand T.Normalsize T.Small . T.reduceCommands . texGeom
+toTex = toTex' T.Normalsize T.Small
+
+
 
 test :: [SymopGeom Integer]
 test = map read [

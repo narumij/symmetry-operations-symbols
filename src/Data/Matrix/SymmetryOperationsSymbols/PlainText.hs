@@ -22,24 +22,9 @@ triplet (a,b,c) = intercalate "," . map (show . Slash) $ [a,b,c]
 tripletParen :: Integral a => (Ratio a,Ratio a,Ratio a) -> String
 tripletParen = ("(" ++) . (++ ")") . triplet
 
-showSymbol :: NFold -> String
-showSymbol ThreeFold = "3"
-showSymbol FourFold  = "4"
-showSymbol SixFold   = "6"
-
 showSense :: Sense -> String
 showSense Positive = "+"
 showSense Negative = "-"
-
-showABC :: ABC -> String
-showABC A = "a"
-showABC B = "b"
-showABC C = "c"
-
-showDGN :: DGN -> String
-showDGN D = "d"
-showDGN G = "g"
-showDGN N = "n"
 
 showPlane :: Integral a => SymopGeom a -> String
 showPlane = prettyXYZ . fromLists . plane

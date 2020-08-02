@@ -21,3 +21,17 @@ data SymopGeom a
   | RotInversion    { nFold :: NFold, sense :: Sense, axis :: [[Ratio a]], point :: (Ratio a,Ratio a,Ratio a) }
   deriving (Read,Show,Eq)
 
+showSymbol :: NFold -> String
+showSymbol ThreeFold = "3"
+showSymbol FourFold  = "4"
+showSymbol SixFold   = "6"
+
+showABC :: ABC -> String
+showABC A = "a"
+showABC B = "b"
+showABC C = "c"
+
+showDGN :: DGN -> String
+showDGN D = "d"
+showDGN G = "g"
+showDGN N = "n"
