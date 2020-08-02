@@ -4,6 +4,7 @@ module Data.Matrix.SymmetryOperationsSymbols.Symbol (
 
 import Control.Monad
 
+
 data Symbol
    = Id  --  '1'
    | T   --   t

@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation (
     SymmetryOperation(..),
     NFold(..),
@@ -5,18 +7,46 @@ module Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation (
     ABC(..),
     DGN(..),
     showSymmetryOperation,
+    fromSymmetryOperation,
+    fromSymop,
     )
     where
+
+import Control.Monad
 
 import Data.Ratio
 import Data.Matrix
 import Data.Matrix.AsXYZ
 import Data.Matrix.SymmetryOperationsSymbols.Common
+import Data.Matrix.SymmetryOperationsSymbols.Common2
+import Data.Matrix.SymmetryOperationsSymbols.SymopGeom (ABC(..),DGN(..),NFold(..),Sense(..))
+import qualified Data.Matrix.SymmetryOperationsSymbols.SymopGeom as S
 
-data ABC = A | B | C deriving (Show,Eq)
-data DGN = D | G | N deriving (Show,Eq)
-data NFold = ThreeFold | FourFold | SixFold deriving (Show,Eq)
-data Sense = Positive | Negative deriving (Show,Eq)
+fromSymmetryOperation :: SymmetryOperation a -> S.SymopGeom a
+fromSymmetryOperation Identity = S.Identity
+fromSymmetryOperation (Translation a) = S.Translation a
+fromSymmetryOperation (Reflection a) = S.Reflection (toLists a)
+fromSymmetryOperation (GlideABC a b) = S.GlideABC a (toLists b)
+fromSymmetryOperation (GlideDGN a b c) = S.GlideDGN a (toLists b) c
+fromSymmetryOperation (TwoFoldRotation a) = S.TwoFoldRotation (toLists a)
+fromSymmetryOperation (TwoFoldScrew a b) = S.TwoFoldScrew (toLists a) b
+fromSymmetryOperation (NFoldRotation a b c) = S.NFoldRotation a b (toLists c)
+fromSymmetryOperation (NFoldScrew a b c d) = S.NFoldScrew a b (toLists c) d
+fromSymmetryOperation (Inversion a) = S.Inversion a
+fromSymmetryOperation (RotInversion a b c d) = S.RotInversion a b (toLists c) d
+
+fromSymop :: S.SymopGeom a -> SymmetryOperation a
+fromSymop S.Identity = Identity
+fromSymop (S.Translation a) = Translation a
+fromSymop (S.Reflection a) = Reflection (fromLists a)
+fromSymop (S.GlideABC a b) = GlideABC a (fromLists b)
+fromSymop (S.GlideDGN a b c) = GlideDGN a (fromLists b) c
+fromSymop (S.TwoFoldRotation a) = TwoFoldRotation (fromLists a)
+fromSymop (S.TwoFoldScrew a b) = TwoFoldScrew (fromLists a) b
+fromSymop (S.NFoldRotation a b c) = NFoldRotation a b (fromLists c)
+fromSymop (S.NFoldScrew a b c d) = NFoldScrew a b (fromLists c) d
+fromSymop (S.Inversion a) = Inversion a
+fromSymop (S.RotInversion a b c d) = RotInversion a b (fromLists c) d
 
 data SymmetryOperation a
   = Identity
@@ -30,7 +60,17 @@ data SymmetryOperation a
   | NFoldScrew      { nFold :: NFold, sense :: Sense, axis :: Matrix (Ratio a), vector :: (Ratio a,Ratio a,Ratio a) }
   | Inversion       { centre :: (Ratio a,Ratio a,Ratio a) }
   | RotInversion    { nFold :: NFold, sense :: Sense, axis :: Matrix (Ratio a), point :: (Ratio a,Ratio a,Ratio a) }
-  deriving (Show,Eq)
+  deriving (Eq)
+
+instance (Integral a,Read a) => Read (SymmetryOperation a) where
+  readsPrec n s = do
+    (symop,st) <- reads s
+    return (fromSymop symop, st)
+
+instance (Integral a,Show a) => Show (SymmetryOperation a) where
+  showsPrec n s = do
+    shows (fromSymmetryOperation s)
+
 
 showSymbol :: NFold -> String
 showSymbol ThreeFold = "3"
@@ -74,49 +114,4 @@ showSymmetryOperation val@Inversion {}
 showSymmetryOperation val@RotInversion {}
   = concat ["-",showSymbol (nFold val),showSense (sense val)," ",prettyXYZ $ axis val,"; ",triplet $ point val]
 
-
-data TexPart = Str String deriving Show
-
-label :: String -> String
-label l = "\\" ++ l
-
-curly :: String -> String
-curly a = "{" ++ a ++ "}"
-
-bar :: String -> String
-bar a = label "overline" ++ curly a
-
-texSymmetryOperation :: Integral a => SymmetryOperation a -> [TexPart]
-
-texSymmetryOperation Identity = [Str "1"]
-
-texSymmetryOperation val@Translation {}
-  = [Str $ concat ["t", tripletParen $ vector val," "]]
-
-texSymmetryOperation val@Reflection {}
-  = [Str $ concat ["m", prettyXYZ $ plane val]]
-
-texSymmetryOperation val@GlideABC {}
-  = [Str $ concat [showABC $ abc val,"  ",prettyXYZ $ plane val]]
-
-texSymmetryOperation val@GlideDGN {}
-  = [Str $ concat [showDGN $ dgn val," ",tripletParen $ glide val," ",prettyXYZ $ plane val]]
-
-texSymmetryOperation val@TwoFoldRotation {}
-  = [Str $ concat ["2",prettyXYZ $ axis val]]
-
-texSymmetryOperation val@TwoFoldScrew {}
-  = [Str $ concat ["2",tripletParen $ vector val," ",prettyXYZ $ axis val]]
-
-texSymmetryOperation val@NFoldRotation {}
-  = [Str $ concat [showSymbol (nFold val),showSense (sense val)," ",prettyXYZ $ axis val]]
-
-texSymmetryOperation val@NFoldScrew {}
-  = [Str $ concat [showSymbol (nFold val),showSense (sense val),tripletParen $ vector val," ",prettyXYZ $ axis val]]
-
-texSymmetryOperation val@Inversion {}
-  = [Str $ concat [label "overline" ++ curly "1", triplet $ centre val]]
-
-texSymmetryOperation val@RotInversion {}
-  = [Str $ concat [label "overline" ++ curly (showSymbol (nFold val)),showSense (sense val)," ",prettyXYZ $ axis val,"; ",triplet $ point val]]
 

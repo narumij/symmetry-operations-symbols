@@ -27,6 +27,7 @@ module Data.Matrix.SymmetryOperationsSymbols (
   hexagonal
   ) where
 
+import Data.Maybe
 import Data.Ratio (Ratio)    
 import Data.Matrix (Matrix,detLU,trace,identity)
 import Text.ParserCombinators.Parsec (ParseError,parse)
@@ -48,9 +49,7 @@ import Data.Matrix.AsXYZ
 
 #if MIN_VERSION_base(4,11,0)
 import Control.Monad.Fail (MonadFail)
-
 import qualified Control.Monad.Fail as Fail
-
 instance Fail.MonadFail (Either String) where
   fail = Left
 #endif
@@ -79,18 +78,18 @@ fromMatrix' :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m Strin
 #else
 fromMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m String
 #endif
-fromMatrix' m = showSymmetryOperation <$> fromMatrix'' m
+fromMatrix' m = showSymmetryOperation <$> readMatrix' m
 
 -- | Derivation of geometric representation of symmetry operations from given matrix of symmetry operations
 --
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
 #if MIN_VERSION_base(4,11,0)
-fromMatrix'' :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+readMatrix' :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
 #else
-fromMatrix'' :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+readMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
 #endif
-fromMatrix'' m
+readMatrix' m
   -- (i)
   | rotPart m == identity 3             = unitMatrixCase m
   -- (ii) (a)
@@ -100,10 +99,15 @@ fromMatrix'' m
   -- -- (ii) (c)
   | correpondToGlideOrReflection tr det = glideOrReflectionCase m
   -- --
-  | otherwise = fail "matrix is not symmetry operation."
+  | otherwise = fail "matrix is probably not symmetry operation."
   where
   tr  = trace (rotPart m)
   det = detLU (rotPart m)
+
+readMatrix :: Integral a =>
+              Matrix (Ratio a) -- ^ 3x4 or 4x4 Matrix
+           -> Maybe (SymmetryOperation a)
+readMatrix = readMatrix'
 
   -- | Derivation of matrix representation from a string of geometric representations of symmetric operations
 -- for cubic, tetragonal, orthorhombic, monoclinic, triclinic or rhombohedral.
