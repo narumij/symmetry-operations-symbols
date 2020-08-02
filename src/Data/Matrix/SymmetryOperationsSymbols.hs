@@ -75,18 +75,23 @@ fromMatrix = fromMatrix'
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
 #if MIN_VERSION_base(4,11,0)
-fromMatrix' :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m String
+fromMatrix' :: (MonadFail m, Integral a) => Matrix (Ratio a) -> m String
 #else
-fromMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m String
+-- fromMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m String
 #endif
-fromMatrix' m = showSymmetryOperation . fromSymop <$> readMatrix' m
+fromMatrix' m = showSymopGeom <$> readMatrix' m
+
+readMatrix :: Integral a =>
+              Matrix (Ratio a) -- ^ 3x4 or 4x4 Matrix
+           -> Maybe (SymopGeom a)
+readMatrix = readMatrix'
 
 -- | Derivation of geometric representation of symmetry operations from given matrix of symmetry operations
 --
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
 #if MIN_VERSION_base(4,11,0)
-readMatrix' :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymopGeom a)
+readMatrix' :: (MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymopGeom a)
 #else
 readMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymopGeom a)
 #endif
@@ -104,11 +109,6 @@ readMatrix' m
   where
   tr  = trace (rotPart m)
   det = detLU (rotPart m)
-
-readMatrix :: Integral a =>
-              Matrix (Ratio a) -- ^ 3x4 or 4x4 Matrix
-           -> Maybe (SymopGeom a)
-readMatrix = readMatrix'
 
 -- | Derivation of matrix representation from a string of geometric representations of symmetric operations
 -- for cubic, tetragonal, orthorhombic, monoclinic, triclinic or rhombohedral.

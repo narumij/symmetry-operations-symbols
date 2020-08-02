@@ -22,13 +22,12 @@ module Data.Matrix.SymmetryOperationsSymbols.UnitMatrixCase (
 import Data.Ratio (Ratio)    
 import Data.Matrix
 import Data.Matrix.SymmetryOperationsSymbols.Common
-import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
+import Data.Matrix.SymmetryOperationsSymbols.SymopGeom
 
 -- | Case (i) The matrix W is the unit matrix:
-unitMatrixCase' w
+unitMatrixCase w
     | all (== 0) w' = return Identity
     | otherwise     = return $ Translation { vector = (a,b,c) }
     where
       w'@[a,b,c] = toList . transPart $ w
 
-unitMatrixCase w = fromSymmetryOperation <$> unitMatrixCase' w

@@ -8,7 +8,8 @@ module Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation (
     DGN(..),
     showSymmetryOperation,
     fromSymmetryOperation,
-    fromSymop,
+    fromSymopGeom,
+    showSymopGeom,
     )
     where
 
@@ -18,7 +19,6 @@ import Data.Ratio
 import Data.Matrix
 import Data.Matrix.AsXYZ
 import Data.Matrix.SymmetryOperationsSymbols.Common
-import Data.Matrix.SymmetryOperationsSymbols.Common2
 import Data.Matrix.SymmetryOperationsSymbols.SymopGeom (ABC(..),DGN(..),NFold(..),Sense(..))
 import qualified Data.Matrix.SymmetryOperationsSymbols.SymopGeom as S
 
@@ -35,18 +35,18 @@ fromSymmetryOperation (NFoldScrew a b c d) = S.NFoldScrew a b (toLists c) d
 fromSymmetryOperation (Inversion a) = S.Inversion a
 fromSymmetryOperation (RotInversion a b c d) = S.RotInversion a b (toLists c) d
 
-fromSymop :: S.SymopGeom a -> SymmetryOperation a
-fromSymop S.Identity = Identity
-fromSymop (S.Translation a) = Translation a
-fromSymop (S.Reflection a) = Reflection (fromLists a)
-fromSymop (S.GlideABC a b) = GlideABC a (fromLists b)
-fromSymop (S.GlideDGN a b c) = GlideDGN a (fromLists b) c
-fromSymop (S.TwoFoldRotation a) = TwoFoldRotation (fromLists a)
-fromSymop (S.TwoFoldScrew a b) = TwoFoldScrew (fromLists a) b
-fromSymop (S.NFoldRotation a b c) = NFoldRotation a b (fromLists c)
-fromSymop (S.NFoldScrew a b c d) = NFoldScrew a b (fromLists c) d
-fromSymop (S.Inversion a) = Inversion a
-fromSymop (S.RotInversion a b c d) = RotInversion a b (fromLists c) d
+fromSymopGeom :: S.SymopGeom a -> SymmetryOperation a
+fromSymopGeom  S.Identity = Identity
+fromSymopGeom (S.Translation a) = Translation a
+fromSymopGeom (S.Reflection a) = Reflection (fromLists a)
+fromSymopGeom (S.GlideABC a b) = GlideABC a (fromLists b)
+fromSymopGeom (S.GlideDGN a b c) = GlideDGN a (fromLists b) c
+fromSymopGeom (S.TwoFoldRotation a) = TwoFoldRotation (fromLists a)
+fromSymopGeom (S.TwoFoldScrew a b) = TwoFoldScrew (fromLists a) b
+fromSymopGeom (S.NFoldRotation a b c) = NFoldRotation a b (fromLists c)
+fromSymopGeom (S.NFoldScrew a b c d) = NFoldScrew a b (fromLists c) d
+fromSymopGeom (S.Inversion a) = Inversion a
+fromSymopGeom (S.RotInversion a b c d) = RotInversion a b (fromLists c) d
 
 data SymmetryOperation a
   = Identity
@@ -65,7 +65,7 @@ data SymmetryOperation a
 instance (Integral a,Read a) => Read (SymmetryOperation a) where
   readsPrec n s = do
     (symop,st) <- reads s
-    return (fromSymop symop, st)
+    return (fromSymopGeom symop, st)
 
 instance (Integral a,Show a) => Show (SymmetryOperation a) where
   showsPrec n s = do
@@ -114,4 +114,6 @@ showSymmetryOperation val@Inversion {}
 showSymmetryOperation val@RotInversion {}
   = concat ["-",showSymbol (nFold val),showSense (sense val)," ",prettyXYZ $ axis val,"; ",triplet $ point val]
 
+showSymopGeom :: Integral a => S.SymopGeom a -> String
+showSymopGeom = showSymmetryOperation . fromSymopGeom
 

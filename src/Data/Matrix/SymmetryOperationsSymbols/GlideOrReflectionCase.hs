@@ -27,7 +27,8 @@ import Data.Matrix hiding (transpose)
 import Data.Matrix.SymmetryOperationsSymbols.Solve
 import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
-import qualified Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation as S
+-- import qualified Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation as S
+import qualified Data.Matrix.SymmetryOperationsSymbols.SymopGeom as S
 
 #if MIN_VERSION_base(4,11,0)
 import Control.Monad.Fail (MonadFail)
@@ -39,9 +40,9 @@ import Control.Monad.Fail (MonadFail)
 #else
 -- glideOrReflectionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
 #endif
-glideOrReflectionCase m = S.fromSymmetryOperation . arrange m <$> solvingEquation m
+glideOrReflectionCase m = arrange m <$> solvingEquation m
 
-arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> S.SymmetryOperation a
+arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> S.SymopGeom a
 arrange m ans
       | sym == M           = S.Reflection { S.plane = location }
       | sym `elem` [A,B,C] = S.GlideABC { S.abc = abc, S.plane = location }
@@ -55,7 +56,7 @@ arrange m ans
         dgn | sym == D = S.D
             | sym == G = S.G
             | sym == N = S.N
-        location = locationOf m <|> fromList 3 1 ans
+        location = toLists $ locationOf m <|> fromList 3 1 ans
 
         
 -- for repl check
