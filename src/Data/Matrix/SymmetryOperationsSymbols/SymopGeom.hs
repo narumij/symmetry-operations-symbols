@@ -1,7 +1,6 @@
 module Data.Matrix.SymmetryOperationsSymbols.SymopGeom where
 
 import Data.Ratio
---import Data.Matrix.SymmetryOperationsSymbols.Common2
 
 data ABC = A | B | C deriving (Show,Read,Eq)
 data DGN = D | G | N deriving (Show,Read,Eq)
@@ -21,3 +20,4 @@ data SymopGeom a
   | Inversion       { centre :: (Ratio a,Ratio a,Ratio a) }
   | RotInversion    { nFold :: NFold, sense :: Sense, axis :: [[Ratio a]], point :: (Ratio a,Ratio a,Ratio a) }
   deriving (Read,Show,Eq)
+

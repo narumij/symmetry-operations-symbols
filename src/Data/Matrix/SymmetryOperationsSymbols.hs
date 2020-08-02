@@ -41,9 +41,9 @@ import Data.Matrix.SymmetryOperationsSymbols.RotInversionCase
 
 import Data.Matrix.SymmetryOperationsSymbols.Parser
 import Data.Matrix.SymmetryOperationsSymbols.SymopGeom
-import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation -- (SymmetryOperation)
 import Data.Matrix.SymmetryOperationsSymbols.Calc
 
+import Data.Matrix.SymmetryOperationsSymbols.PlainText
 
 -- for doctest
 import Data.Matrix.AsXYZ
@@ -79,7 +79,7 @@ fromMatrix' :: (MonadFail m, Integral a) => Matrix (Ratio a) -> m String
 #else
 -- fromMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m String
 #endif
-fromMatrix' m = showSymopGeom <$> readMatrix' m
+fromMatrix' m = showAsPlainText <$> readMatrix' m
 
 readMatrix :: Integral a =>
               Matrix (Ratio a) -- ^ 3x4 or 4x4 Matrix

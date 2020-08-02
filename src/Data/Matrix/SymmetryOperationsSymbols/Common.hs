@@ -23,8 +23,8 @@ module Data.Matrix.SymmetryOperationsSymbols.Common (
   rotPart,
   transPart,
   iw,
-  triplet,
-  tripletParen,
+--  triplet,
+--  tripletParen,
   adjustAnswerOnAxis,
   axisOf,
   senseOf,
@@ -56,17 +56,6 @@ maybeToEither :: a -> Maybe b -> Either a b
 maybeToEither _ (Just b) = Right b
 maybeToEither a  Nothing = Left a
 
--- |
--- >>> triplet (1%2,3%4,5%6)
--- "1/2,3/4,5/6"
-triplet :: Integral a => (Ratio a,Ratio a,Ratio a) -> String
-triplet (a,b,c) = intercalate "," . map (show . Slash) $ [a,b,c]
-
--- |
--- >>> triplet (1%2,3%4,5%6)
--- "(1/2,3/4,5/6)"
-tripletParen :: Integral a => (Ratio a,Ratio a,Ratio a) -> String
-tripletParen = ("(" ++) . (++ ")") . triplet
 
 -- | calculate (I-W)
 iw :: Num c => Matrix c -> Matrix c

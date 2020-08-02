@@ -1,23 +1,25 @@
 module Data.Matrix.SymmetryOperationsSymbols.Tex where
 
+import Control.Monad (join)
+
 import Data.Ratio
 import Data.Ratio.Slash
 import Data.List
+import Data.Matrix
 import Data.Matrix.AsXYZ
-import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
+import qualified Data.Matrix.AsXYZ.Tex as T
+import Data.Matrix.SymmetryOperationsSymbols.SymopGeom
 
-data TexPart = Str String deriving Show
+import Numeric
 
-{-
+data TexPart = Str String | Space deriving Show
 
-label :: String -> String
-label l = "\\" ++ l
+texRatio :: Integral a => Ratio a -> [T.Command]
+texRatio n = [T.SizeS, T.Str . bar n . T.num $ n, T.SizeN]
+  where
+    bar n | n < 0 = T.bar
+          | otherwise = id
 
-curly :: String -> String
-curly a = "{" ++ a ++ "}"
-
-bar :: String -> String
-bar a = label "overline" ++ curly a
 
 -- |
 -- >>> triplet (1%2,3%4,5%6)
@@ -25,20 +27,29 @@ bar a = label "overline" ++ curly a
 triplet :: Integral a => (Ratio a,Ratio a,Ratio a) -> String
 triplet (a,b,c) = intercalate "," . map (show . Slash) $ [a,b,c]
 
+texTriplet :: Integral a => (Ratio a,Ratio a,Ratio a) -> [T.Command]
+texTriplet (a,b,c) = intercalate [T.Str ","] . map texRatio $ [a,b,c]
+
 -- |
 -- >>> triplet (1%2,3%4,5%6)
 -- "(1/2,3/4,5/6)"
 tripletParen :: Integral a => (Ratio a,Ratio a,Ratio a) -> String
 tripletParen = ("(" ++) . (++ ")") . triplet
 
+texTripletParen :: Integral a => (Ratio a,Ratio a,Ratio a) -> [T.Command]
+texTripletParen = ([T.SizeN,T.Str "("] ++) . (++ [T.SizeN,T.Str ")"]) . texTriplet
+
+
 showSymbol :: NFold -> String
 showSymbol ThreeFold = "3"
 showSymbol FourFold  = "4"
 showSymbol SixFold   = "6"
 
-texSense :: Sense -> String
-texSense Positive = "^+"
-texSense Negative = "^-"
+texSense :: Sense -> [T.Command]
+texSense Positive = [T.Str "^+"]
+texSense Negative = [T.Str "^-"]
+
+texSense' = ([T.SizeS] ++) . (++[T.SizeN]) . texSense . sense
 
 showABC :: ABC -> String
 showABC A = "a"
@@ -50,39 +61,93 @@ showDGN D = "d"
 showDGN G = "g"
 showDGN N = "n"
 
+showVector :: Integral a => SymopGeom a -> String
+showVector = tripletParen . vector
 
-texSymmetryOperation :: Integral a => SymmetryOperation a -> [TexPart]
+texVector :: Integral a => SymopGeom a -> [T.Command]
+texVector = texTripletParen . vector
 
-texSymmetryOperation Identity = [Str "1"]
+showPlane :: Integral a => SymopGeom a -> String
+showPlane = prettyXYZ . fromLists . plane
 
-texSymmetryOperation val@Translation {}
-  = [Str $ concat ["t", tripletParen $ vector val," "]]
+texPlane :: Integral a => SymopGeom a -> [T.Command]
+texPlane = T.commands "xyz" . take 3 . plane
 
-texSymmetryOperation val@Reflection {}
-  = [Str $ concat ["m", prettyXYZ $ plane val]]
+showGlide :: Integral a => SymopGeom a -> String
+showGlide = tripletParen . glide
 
-texSymmetryOperation val@GlideABC {}
-  = [Str $ concat [showABC $ abc val,"  ",prettyXYZ $ plane val]]
+texGlide :: Integral a => SymopGeom a -> [T.Command]
+texGlide = texTripletParen . glide
 
-texSymmetryOperation val@GlideDGN {}
-  = [Str $ concat [showDGN $ dgn val," ",tripletParen $ glide val," ",prettyXYZ $ plane val]]
+showAxis :: Integral a => SymopGeom a -> String
+showAxis = prettyXYZ . fromLists . axis
 
-texSymmetryOperation val@TwoFoldRotation {}
-  = [Str $ concat ["2",prettyXYZ $ axis val]]
+texAxis :: Integral a => SymopGeom a -> [T.Command]
+texAxis = T.commands "xyz" . take 3 . axis
 
-texSymmetryOperation val@TwoFoldScrew {}
-  = [Str $ concat ["2",tripletParen $ vector val," ",prettyXYZ $ axis val]]
+showPoint :: Integral a => SymopGeom a -> String
+showPoint = triplet . point
 
-texSymmetryOperation val@NFoldRotation {}
-  = [Str $ concat [showSymbol (nFold val),showSense (sense val)," ",prettyXYZ $ axis val]]
+texPoint :: Integral a => SymopGeom a -> [T.Command]
+texPoint = texTriplet . point
 
-texSymmetryOperation val@NFoldScrew {}
-  = [Str $ concat [showSymbol (nFold val),showSense (sense val),tripletParen $ vector val," ",prettyXYZ $ axis val]]
+texSpace :: [T.Command]
+texSpace = [T.Str "\\ "]
 
-texSymmetryOperation val@Inversion {}
-  = [Str $ concat [label "overline" ++ curly "1", triplet $ centre val]]
+texGeom :: Integral a => SymopGeom a -> [T.Command]
+texGeom Identity = [T.SizeN, T.Str "1"]
 
-texSymmetryOperation val@RotInversion {}
-  = [Str $ concat [label "overline" ++ curly (showSymbol (nFold val)),showSense (sense val)," ",prettyXYZ $ axis val,"; ",triplet $ point val]]
+texGeom val@Translation {}
+  = [T.SizeN, T.Str "t"] ++ texVector val
 
--}
+texGeom val@Reflection {}
+  = [T.SizeN, T.Str "m"] ++ texSpace ++ texPlane val
+
+texGeom val@GlideABC {}
+  = [T.SizeN, T.Str . showABC . abc $ val] ++ texSpace ++ texPlane val
+
+texGeom val@GlideDGN {}
+  = [T.SizeN, T.Str . showDGN . dgn $ val] ++ texGlide val ++ texSpace ++ texPlane val
+
+texGeom val@TwoFoldRotation {}
+  = [T.SizeN, T.Str "2"]  ++ texSpace ++ texAxis val
+
+texGeom val@TwoFoldScrew {}
+  = [T.SizeN, T.Str "2"] ++ texVector val ++ texSpace ++ texAxis val
+
+texGeom val@NFoldRotation {}
+  = [T.SizeN, T.Str . showSymbol . nFold $ val] ++ texSense' val ++ texSpace ++ texAxis val
+
+texGeom val@NFoldScrew {}
+  = [T.SizeN, T.Str . showSymbol . nFold $ val] ++ texSense' val ++ texVector val ++ texSpace ++ texAxis val
+
+texGeom val@Inversion {}
+  = [T.SizeN, T.Str $ T.label "overline" ++ T.curly "1"] ++ texSpace ++ (texTriplet . centre $ val)
+
+texGeom val@RotInversion {}
+  = [T.SizeN, T.Str $ T.label "overline" ++ T.curly (showSymbol (nFold val))] ++ texSense' val ++ texSpace ++ texAxis val  ++ texSpace ++ [T.Str "; "] ++ texSpace ++ texPoint val
+
+toTex :: Integral a => SymopGeom a -> String
+toTex = T.renderCommand T.Normalsize T.Small . T.reduceCommands . texGeom
+
+test :: [SymopGeom Integer]
+test = map read [
+  "Identity",
+  "Translation {vector = (0 % 1,1 % 2,1 % 2)}",
+  "Reflection {plane = [[1 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,1 % 1,0 % 1]]}",
+  "TwoFoldRotation {axis = [[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,1 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,0 % 1,0 % 1]]}",
+  "TwoFoldScrew {axis = [[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,1 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,0 % 1,0 % 1]], vector = (0 % 1,1 % 2,0 % 1)}",
+  "GlideABC {abc = C, plane = [[1 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,1 % 1,0 % 1]]}",
+  "GlideDGN {dgn = N, plane = [[1 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,1 % 1,0 % 1]], glide = (1 % 2,0 % 1,1 % 2)}",
+  "Inversion {centre = (1 % 4,1 % 4,1 % 4)}",
+  "GlideDGN {dgn = D, plane = [[1 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,0 % 1,1 % 8],[0 % 1,0 % 1,1 % 1,0 % 1]], glide = (1 % 4,0 % 1,1 % 4)}",
+  "NFoldRotation {nFold = FourFold, sense = Positive, axis = [[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,1 % 1,0 % 1]]}",
+  "NFoldRotation {nFold = FourFold, sense = Negative, axis = [[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,1 % 1,0 % 1]]}",
+  "NFoldScrew {nFold = FourFold, sense = Positive, axis = [[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,1 % 1,0 % 1]], vector = (0 % 1,0 % 1,1 % 4)}",
+  "NFoldScrew {nFold = FourFold, sense = Negative, axis = [[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,1 % 1,0 % 1]], vector = (0 % 1,0 % 1,3 % 4)}",
+  "Inversion {centre = (0 % 1,0 % 1,0 % 1)}",
+  "RotInversion {nFold = FourFold, sense = Positive, axis = [[0 % 1,0 % 1,0 % 1,1 % 2],[0 % 1,0 % 1,0 % 1,1 % 4],[0 % 1,0 % 1,1 % 1,0 % 1]], point = (1 % 2,1 % 4,3 % 8)}",
+  "RotInversion {nFold = FourFold, sense = Negative, axis = [[0 % 1,0 % 1,0 % 1,0 % 1],[0 % 1,0 % 1,0 % 1,1 % 4],[0 % 1,0 % 1,1 % 1,0 % 1]], point = (0 % 1,1 % 4,1 % 8)}"
+  ]
+
+
