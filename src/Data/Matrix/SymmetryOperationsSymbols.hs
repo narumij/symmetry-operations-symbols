@@ -21,6 +21,8 @@ Haskell Derivation of symbols and coordinate triplets Library
 module Data.Matrix.SymmetryOperationsSymbols (
   fromMatrix,
   fromMatrix',
+  readMatrix,
+  readMatrix',
   toMatrix,
   toMatrixHex,
   notHexagonal,
