@@ -47,8 +47,6 @@ import Data.Matrix.SymmetryOperationsSymbols.Calc
 
 import Data.Matrix.SymmetryOperationsSymbols.PlainText
 
-import Data.Matrix.SymmetryOperationsSymbols.Tex
-
 -- for doctest
 import Data.Matrix.AsXYZ
 

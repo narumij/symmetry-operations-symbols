@@ -48,7 +48,7 @@ packages:
 # (e.g., acme-missiles-0.3)
 #extra-deps: []
 extra-deps:
-- location: https://github.com/narumij/matrix-as-xyz/archive/0.1.2.0.a4.tar.gz
+- location: https://github.com/narumij/matrix-as-xyz/archive/0.1.2.0.a6.tar.gz
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

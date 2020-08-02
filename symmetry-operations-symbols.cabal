@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 171d7e2c45a4c871f1610a2adeb7c1252a354b7bc4ca82976fa255c3bf59f7ec
+-- hash: c04d23e3557d039fb170a2ca7bc787f0695bca4b42449f1420a99c6711a625a8
 
 name:           symmetry-operations-symbols
 version:        0.0.2.0
@@ -39,7 +39,6 @@ library
       Data.Matrix.SymmetryOperationsSymbols.Solve
       Data.Matrix.SymmetryOperationsSymbols.Symbol
       Data.Matrix.SymmetryOperationsSymbols.SymopGeom
-      Data.Matrix.SymmetryOperationsSymbols.Tex
       Data.Matrix.SymmetryOperationsSymbols.UnitMatrixCase
   other-modules:
       Paths_symmetry_operations_symbols
