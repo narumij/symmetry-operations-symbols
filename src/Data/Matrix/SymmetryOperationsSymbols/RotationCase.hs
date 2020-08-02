@@ -33,11 +33,11 @@ import Control.Monad.Fail (MonadFail)
 
 -- | Case (ii) (a) W corresponds to a rotoinversion
 #if MIN_VERSION_base(4,11,0)
-nFoldRotationCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+--nFoldRotationCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymopGeom a)
 #else
-nFoldRotationCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+--nFoldRotationCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymopGeom a)
 #endif
-nFoldRotationCase m = arrange m <$> solvingEquation m
+nFoldRotationCase m = fromSymmetryOperation . arrange m <$> solvingEquation m
 
 arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> SymmetryOperation a
 arrange m ans 

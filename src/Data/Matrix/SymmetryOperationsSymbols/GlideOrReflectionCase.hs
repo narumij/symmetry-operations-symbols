@@ -35,11 +35,11 @@ import Control.Monad.Fail (MonadFail)
 
 -- | Case (ii) (c) W corresponds to a (glide) reflection
 #if MIN_VERSION_base(4,11,0)
-glideOrReflectionCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
+-- glideOrReflectionCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
 #else
-glideOrReflectionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
+-- glideOrReflectionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
 #endif
-glideOrReflectionCase m = arrange m <$> solvingEquation m
+glideOrReflectionCase m = S.fromSymmetryOperation . arrange m <$> solvingEquation m
 
 arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> S.SymmetryOperation a
 arrange m ans

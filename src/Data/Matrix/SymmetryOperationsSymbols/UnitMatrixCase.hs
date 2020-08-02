@@ -25,9 +25,10 @@ import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
 
 -- | Case (i) The matrix W is the unit matrix:
-unitMatrixCase w
+unitMatrixCase' w
     | all (== 0) w' = return Identity
     | otherwise     = return $ Translation { vector = (a,b,c) }
     where
       w'@[a,b,c] = toList . transPart $ w
 
+unitMatrixCase w = fromSymmetryOperation <$> unitMatrixCase' w

@@ -34,11 +34,11 @@ import Control.Monad.Fail (MonadFail)
 
 -- | Case (ii) (b) W corresponds to an n-fold rotation
 #if MIN_VERSION_base(4,11,0)
-rotInversionCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+--rotInversionCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
 #else
-rotInversionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+-- rotInversionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
 #endif
-rotInversionCase m = arrange m <$> calc m
+rotInversionCase m = fromSymmetryOperation . arrange m <$> calc m
 
 #if MIN_VERSION_base(4,11,0)
 calc :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m ([Ratio a], Matrix (Ratio a))
