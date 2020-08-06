@@ -51,30 +51,6 @@ repl> fromMatrix' . fromXYZ $ "-y,-x+1/2,z"
 " g (-1/4,1/4,0) x+1/4,-x,z"
 ```
 
-## Tex test
-
-$ \normalsize 1 $
-$ \normalsize t(\small 0\normalsize ,\small \frac{1}{2}\normalsize ,\small \frac{1}{2}\normalsize ) $
-$ \normalsize m\ x,0,z $
-$ \normalsize 2\ 0,y,0 $
-$ \normalsize 2(\small 0\normalsize ,\small \frac{1}{2}\normalsize ,\small 0\normalsize )\ 0,y,0 $
-$ \normalsize c\ x,0,z $
-$ \normalsize n(\small \frac{1}{2}\normalsize ,\small 0\normalsize ,\small \frac{1}{2}\normalsize )\ x,0,z $
-$ \normalsize \overline{1}\ \small \frac{1}{4}\normalsize ,\small \frac{1}{4}\normalsize ,\small \frac{1}{4} $
-$ \normalsize d(\small \frac{1}{4}\normalsize ,\small 0\normalsize ,\small \frac{1}{4}\normalsize )\ x,\small \frac{1}{8}\normalsize ,z $
-$ \normalsize 4\small ^+\normalsize \ 0,0,z $
-$ \normalsize 4\small ^-\normalsize \ 0,0,z $
-$ \normalsize 4\small ^+\normalsize (\small 0\normalsize ,\small 0\normalsize ,\small \frac{1}{4}\normalsize )\ 0,0,z $
-$ \normalsize 4\small ^-\normalsize (\small 0\normalsize ,\small 0\normalsize ,\small \frac{3}{4}\normalsize )\ 0,0,z $
-$ \normalsize \overline{1}\ \small 0\normalsize ,\small 0\normalsize ,\small 0 $
-$ \normalsize \overline{4}\small ^+\normalsize \ \small \frac{1}{2}\normalsize ,\small \frac{1}{4}\normalsize ,z\ ; \ \small \frac{1}{2}\normalsize ,\small \frac{1}{4}\normalsize ,\small \frac{3}{8} $
-$ \normalsize \overline{4}\small ^-\normalsize \ 0,\small \frac{1}{4}\normalsize ,z\ ; \ \small 0\normalsize ,\small \frac{1}{4}\normalsize ,\small \frac{1}{8} $
-
-
-
-
-
-
 ## References
 
 1. W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
