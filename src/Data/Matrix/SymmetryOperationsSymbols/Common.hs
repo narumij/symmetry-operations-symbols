@@ -33,6 +33,7 @@ module Data.Matrix.SymmetryOperationsSymbols.Common (
   properMatrixW,
   hexagonalMatrixW,
   fromXYZ'',
+  tbl,
   ) where
 
 import Data.List
