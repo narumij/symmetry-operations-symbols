@@ -33,7 +33,8 @@ module Data.Matrix.SymmetryOperationsSymbols.Common (
   properMatrixW,
   hexagonalMatrixW,
   fromXYZ'',
-  tbl,
+  properTbl,
+  hexagonalTbl,
   ) where
 
 import Data.List
@@ -160,16 +161,16 @@ properMatrixW = lookupMatrixM "matrix W not found (proper)." (fromTbl properTbl)
 
 hexagonalMatrixW = lookupMatrixM "matrix W not found (hexagonal)." (fromTbl hexagonalTbl)
 
-fromTbl :: (Integral a) => [Tbl] -> [MatrixLookupRecord a]
+fromTbl :: (Integral a) => [Tbl a] -> [MatrixLookupRecord a]
 fromTbl = map tblToMLR
 
-tblToMLR :: (Integral a) => Tbl -> MatrixLookupRecord a
+tblToMLR :: (Integral a) => Tbl a -> MatrixLookupRecord a
 tblToMLR (a,s,b,c,d,e,f,g) = ((s,c,rotPart . fromXYZ'' $ d),f)
 
-properTbl :: [Tbl]
+properTbl :: Integral a => [Tbl a]
 properTbl = filter (not . isHex) tbl
 
-hexagonalTbl :: [Tbl]
+hexagonalTbl :: Integral a => [Tbl a]
 hexagonalTbl = filter isHex tbl ++ filter (not . isHex) tbl
 
 primeSymbol :: Symbol -> Symbol
@@ -186,13 +187,13 @@ data Lattice = Hexagonal | AnythingElse deriving (Eq)
 type SymbolLabel = String
 type Sense = String
 type SymmetryElement = String
-type Orientation = [Integer] -- orientation or location
+type Orientation a = [a] -- orientation or location
 type TransformedCoordinate = String
-type AxisOrNormal = [Integer]
+type AxisOrNormal a = [a]
 
-type Tbl = (Lattice,Symbol,SymbolLabel,Sense,SymmetryElement,Orientation,TransformedCoordinate,AxisOrNormal)
+type Tbl a = (Lattice,Symbol,SymbolLabel,Sense,SymmetryElement,Orientation a,TransformedCoordinate,AxisOrNormal a)
 
-tbl :: [Tbl]
+tbl :: Integral a => [Tbl a]
 tbl = [
 -- Table 11.2.2.1. Matrices for point-group symmetry operations and orientation
 -- of corresponding symmetry elements, referred to a cubic, tetragonal, orthorhombic,
