@@ -26,7 +26,8 @@ module Data.Matrix.SymmetryOperationsSymbols (
   toMatrix,
   toMatrixHex,
   notHexagonal,
-  hexagonal
+  hexagonal,
+  liftError,
   ) where
 
 import Data.Maybe
@@ -137,3 +138,11 @@ toMatrixHex :: Integral a =>
                String -- ^ like " -1 0,0,0"
             -> Either ParseError (Matrix (Ratio a)) -- ^ 3x4 Matrix
 toMatrixHex st = parse hexagonal st st
+
+#if MIN_VERSION_base(4,11,0)
+liftError :: MonadFail m => Either ParseError a -> m a
+#else
+liftError :: Monad m => Either ParseError a -> m a
+#endif
+liftError (Left s) = fail ""
+liftError (Right m) = return m
