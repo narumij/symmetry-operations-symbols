@@ -31,14 +31,14 @@ import Data.Matrix.AsXYZ
 import qualified Data.Matrix.SymmetryOperationsSymbols.SymopGeom as S
 
 #if MIN_VERSION_base(4,11,0)
-import Control.Monad.Fail (MonadFail)
+import Control.Monad.Fail (MonadFail(..))
 #endif
 
 -- | Case (ii) (c) W corresponds to a (glide) reflection
 #if MIN_VERSION_base(4,11,0)
--- glideOrReflectionCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
+glideOrReflectionCase :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f (S.SymopGeom a)
 #else
--- glideOrReflectionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
+glideOrReflectionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (S.SymopGeom a)
 #endif
 glideOrReflectionCase m = arrange m <$> solvingEquation m
 
@@ -86,9 +86,9 @@ solvingEquation'' :: Integral a => Matrix (Ratio a) -> Maybe [Ratio a]
 solvingEquation'' mat = adjustAnswerOnPlane mat . toList =<< solvingEquation' mat
 
 #if MIN_VERSION_base(4,11,0)
-solvingEquation :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+solvingEquation :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f [Ratio a]
 #else
-solvingEquation :: (Monad m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+solvingEquation :: (Integral a, Monad m) => Matrix (Ratio a) -> m [Ratio a]
 #endif
 solvingEquation mat = case solvingEquation'' mat of
   Nothing -> fail "<GlideOrReflection> when calculate equation solve."

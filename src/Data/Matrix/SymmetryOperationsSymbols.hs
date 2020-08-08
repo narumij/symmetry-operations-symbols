@@ -51,7 +51,7 @@ import Data.Matrix.SymmetryOperationsSymbols.PlainText
 import Data.Matrix.AsXYZ
 
 #if MIN_VERSION_base(4,11,0)
-import Control.Monad.Fail (MonadFail)
+import Control.Monad.Fail (MonadFail(..))
 import qualified Control.Monad.Fail as Fail
 instance Fail.MonadFail (Either String) where
   fail = Left
@@ -77,9 +77,9 @@ fromMatrix = fromMatrix'
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
 #if MIN_VERSION_base(4,11,0)
-fromMatrix' :: (MonadFail m, Integral a) => Matrix (Ratio a) -> m String
+fromMatrix' :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f String
 #else
--- fromMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m String
+fromMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m String
 #endif
 fromMatrix' m = showAsPlainText <$> readMatrix' m
 
@@ -107,7 +107,7 @@ readMatrix' m
   -- -- (ii) (c)
   | correpondToGlideOrReflection tr det = glideOrReflectionCase m
   -- --
-  | otherwise = fail "matrix is probably not symmetry operation."
+  | otherwise = fail $ "coordinate triplet '" ++ prettyXYZ m ++ "' is not symmetry operation."
   where
   tr  = trace (rotPart m)
   det = detLU (rotPart m)
