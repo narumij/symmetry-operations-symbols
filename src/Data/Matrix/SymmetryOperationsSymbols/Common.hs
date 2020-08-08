@@ -33,8 +33,10 @@ module Data.Matrix.SymmetryOperationsSymbols.Common (
   properMatrixW,
   hexagonalMatrixW,
   fromXYZ'',
-  properTbl,
-  hexagonalTbl,
+  MatrixForPointGroupCorrespondingSymmetryElement(..),
+  properMatricesForPointGroup,
+  hexagonalMatricesForPointGroup,
+  matricesForPointGroupCorrespondingSymmetryElements,
   ) where
 
 import Data.List
@@ -157,9 +159,9 @@ lookupMatrixM reason dataTable (sy,se,_,el)
       Nothing -> fail reason
       Just c  -> return c
 
-properMatrixW = lookupMatrixM "matrix W not found (proper)." (fromTbl properTbl)
+properMatrixW = lookupMatrixM "matrix W not found (proper)." (fromTbl properMatricesForPointGroup)
 
-hexagonalMatrixW = lookupMatrixM "matrix W not found (hexagonal)." (fromTbl hexagonalTbl)
+hexagonalMatrixW = lookupMatrixM "matrix W not found (hexagonal)." (fromTbl hexagonalMatricesForPointGroup)
 
 fromTbl :: (Integral a) => [Tbl a] -> [MatrixLookupRecord a]
 fromTbl = map tblToMLR
@@ -167,11 +169,11 @@ fromTbl = map tblToMLR
 tblToMLR :: (Integral a) => Tbl a -> MatrixLookupRecord a
 tblToMLR (a,s,b,c,d,e,f,g) = ((s,c,rotPart . fromXYZ'' $ d),f)
 
-properTbl :: Integral a => [Tbl a]
-properTbl = filter (not . isHex) tbl
+properMatricesForPointGroup :: Integral a => [Tbl a]
+properMatricesForPointGroup = filter (not . isHex) tbl
 
-hexagonalTbl :: Integral a => [Tbl a]
-hexagonalTbl = filter isHex tbl ++ filter (not . isHex) tbl
+hexagonalMatricesForPointGroup :: Integral a => [Tbl a]
+hexagonalMatricesForPointGroup = filter isHex tbl ++ filter (not . isHex) tbl
 
 primeSymbol :: Symbol -> Symbol
 primeSymbol T = Id
@@ -191,10 +193,18 @@ type Orientation a = [a] -- orientation or location
 type TransformedCoordinate = String
 type AxisOrNormal a = [a]
 
-type Tbl a = (Lattice,Symbol,SymbolLabel,Sense,SymmetryElement,Orientation a,TransformedCoordinate,AxisOrNormal a)
+type Tbl a = MatrixForPointGroupCorrespondingSymmetryElement a
 
-tbl :: Integral a => [Tbl a]
-tbl = [
+type MatrixForPointGroupCorrespondingSymmetryElement a
+  = ( Lattice, Symbol, SymbolLabel, Sense, SymmetryElement, Orientation a, TransformedCoordinate, AxisOrNormal a )
+
+tbl :: Integral a => [MatrixForPointGroupCorrespondingSymmetryElement a]
+tbl = matricesForPointGroupCorrespondingSymmetryElements
+
+matricesForPointGroupCorrespondingSymmetryElements ::
+  Integral a => 
+  [MatrixForPointGroupCorrespondingSymmetryElement a]
+matricesForPointGroupCorrespondingSymmetryElements = [
 -- Table 11.2.2.1. Matrices for point-group symmetry operations and orientation
 -- of corresponding symmetry elements, referred to a cubic, tetragonal, orthorhombic,
 -- monoclinic, triclinic or rhombohedral coordinate system
