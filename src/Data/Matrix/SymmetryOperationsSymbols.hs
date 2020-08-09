@@ -29,7 +29,6 @@ module Data.Matrix.SymmetryOperationsSymbols (
   liftError,
   ) where
 
-import Data.Maybe
 import Data.Ratio (Ratio)    
 import Data.Matrix (Matrix,detLU,trace,identity)
 import Text.ParserCombinators.Parsec (ParseError,parse)
@@ -48,7 +47,7 @@ import Data.Matrix.SymmetryOperationsSymbols.Calc
 import Data.Matrix.SymmetryOperationsSymbols.PlainText
 
 -- for doctest
-import Data.Matrix.AsXYZ
+import Data.Matrix.AsXYZ (fromXYZ,prettyXYZ)
 
 #if MIN_VERSION_base(4,11,0)
 import Control.Monad.Fail (MonadFail(..))
