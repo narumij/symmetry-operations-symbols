@@ -55,12 +55,6 @@ import Control.Monad.Fail (MonadFail)
 type ErrorMessage = String
 type SymbolSenseVectorOrientation = (Symbol,String,String,String)
 
--- | borrowed from Base ?.?.?
-maybeToEither :: a -> Maybe b -> Either a b
-maybeToEither _ (Just b) = Right b
-maybeToEither a  Nothing = Left a
-
-
 -- | calculate (I-W)
 iw :: Num c => Matrix c -> Matrix c
 iw = elementwise (-) (identity 3) . rotPart
