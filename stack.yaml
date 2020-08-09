@@ -19,13 +19,16 @@
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
 #resolver: ghc-7.10.3
+#resolver: lts-6.35
 #resolver: ghc-8.0.2
 #resolver: ghc-8.2.2
 #resolver: ghc-8.4.4
+#resolver: lts-12.26
 #resolver: ghc-8.6.5
+resolver: lts-14.27
 #resolver: ghc-8.8.3
 #resolver: ghc-8.10.1
-resolver: lts-16.8
+#resolver: lts-16.8
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -48,33 +51,8 @@ packages:
 # (e.g., acme-missiles-0.3)
 #extra-deps: []
 extra-deps:
-- matrix-as-xyz-0.1.2.1
-
-- doctest-0.17@sha256:684b9736321c255fc8da651a817a14d46afd9aa08a753b344abaa77b343123f2,6988
-- hspec-2.7.1@sha256:0aa48928ce80a34f8ff8c5ef114bb6807edfb8d884bcd7211eceed710e7fb7a8,1769
-- matrix-0.3.6.1@sha256:96ab17d9a959cd5c0e9e6db5bc48069dba5f6fa17f7f4aea838d22f35e7bc047,1941
-- QuickCheck-2.14.1@sha256:01e46d7b0a8d3148288ec977625f62d5516ebb5031a50c63f0453863301b4a79,7736
-- base-compat-0.11.1@sha256:e49c1ce84f556621ef1142a169e4349049c516f5b3e3c3ec6830be503e7d4a93,7140
-- code-page-0.2@sha256:f701393cb1ff7b3ec7880816abc44387647811be31670e884e02d6a20c4aa508,2356
-- ghc-paths-0.1.0.12@sha256:85370fdc615d4be5e09d9269eebb9a3fc7017c40b1a9e0050b121d75908564bd,632
-- hspec-core-2.7.1@sha256:2696420050bafb1b690366b2c0ca8595a27c4597811df036f0c35cf19f46862b,4583
-- hspec-discover-2.7.1@sha256:e8ce36741c06b41de58069814a7d3b7314bdeaab35ae573e3c924739011e0c29,2243
-- hspec-expectations-0.8.2@sha256:e2db24881baadc2d9d23b03cb629e80dcbda89a6b04ace9adb5f4d02ef8b31aa,1594
-- loop-0.3.0@sha256:bcc65428e53e9325523fdb80af3c04750548d8ee3f9ad6841272ca679f331bf2,2485
-- primitive-0.7.1.0@sha256:6a237bb338bcc43193077ff8e8c0f0ce2de14c652231496a15672e8b563a07e2,2604
-- semigroups-0.19.1@sha256:ecae129621e0d2f77bef2f01e4458c2e0567ab6e1f39579c61d7cec8058ebb0e,6262
-- syb-0.7.1@sha256:8d37b1e4d04a9aa8512dc6c2a06e02afc015a2fd3e735bdfeeacb5e2e853323c,2462
-- vector-0.12.1.2@sha256:9291bc581f36e51d5bda9fce57cb980fbec3dd292996896f285fef39eb80a9a0,7364
-- HUnit-1.6.0.0@sha256:8014b27c884becd8041214a1ab263fa92244ca62700a911aff604a1047869298,1570
-- ansi-terminal-0.10.3@sha256:e2fbcef5f980dc234c7ad8e2fa433b0e8109132c9e643bc40ea5608cd5697797,3226
-- call-stack-0.2.0@sha256:5ce796b78d5f964468ec6fe0717b4e7d0430817f37370c47b3e6b38e345b6643,1202
-- clock-0.8@sha256:b4ae207e2d3761450060a0d0feb873269233898039c76fceef9cc1a544067767,4113
-- quickcheck-io-0.2.0@sha256:7bf0b68fb90873825eb2e5e958c1b76126dcf984debb998e81673e6d837e0b2d,1133
-- random-1.2.0@sha256:5ca8674e95c46c7eb90f520c26aea22d403625c97697275434afba66ebd32b05,5897
-- setenv-0.1.1.3@sha256:c5916ac0d2a828473cd171261328a290afe0abd799db1ac8c310682fe778c45b,1053
-- splitmix-0.1.0.1@sha256:22f9662e7e8b173421872241edd39350078a9ed4bb9e9f503948c5b483c79276,5253
-- tf-random-0.5@sha256:14012837d0f0e18fdbbe3d56e67da8622ee5e20b180abce952dd50bd9f36b326,3983
-- colour-2.3.5@sha256:b27db0a3ad40d70bdbd8510a104269f8707592e80757a1abc66a22ba25e5a42f,1801
+- matrix-as-xyz-0.1.1.3
+#- location: https://github.com/narumij/matrix-as-xyz/archive/0.1.2.2.tar.gz
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

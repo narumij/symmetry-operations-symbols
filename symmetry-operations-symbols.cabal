@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3a17fff84d4327a218c081e41a3e67a500dedffe3bfaf8a6a1a37ed935d815a1
+-- hash: d3135bc01cd9eb7a0cdcabc4f6cea6184652351ab90dddc163a3909f97f36957
 
 name:           symmetry-operations-symbols
 version:        0.0.2.0
@@ -46,14 +46,12 @@ library
       src
   build-depends:
       base >=4.8 && <5
-    , doctest
-    , hspec
-    , matrix >=0.3.5 && <4
+    , matrix >=0.1 && <0.4
     , matrix-as-xyz >=0.1 && <0.2
-    , parsec >=3.1 && <4
+    , parsec >=3 && <4
   default-language: Haskell2010
 
-test-suite doctest
+test-suite symmetry-operations-symbols-doctest
   type: exitcode-stdio-1.0
   main-is: test/doctests.hs
   other-modules:
@@ -62,14 +60,13 @@ test-suite doctest
   build-depends:
       base >=4.8 && <5
     , doctest
-    , hspec
-    , matrix >=0.3.5 && <4
+    , matrix >=0.1 && <0.4
     , matrix-as-xyz >=0.1 && <0.2
-    , parsec >=3.1 && <4
+    , parsec >=3 && <4
     , symmetry-operations-symbols
   default-language: Haskell2010
 
-test-suite spec-test
+test-suite symmetry-operations-symbols-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
@@ -83,11 +80,11 @@ test-suite spec-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.8 && <5
-    , doctest
+      QuickCheck
+    , base >=4.8 && <5
     , hspec
-    , matrix >=0.3.5 && <4
+    , matrix >=0.1 && <0.4
     , matrix-as-xyz >=0.1 && <0.2
-    , parsec >=3.1 && <4
+    , parsec >=3 && <4
     , symmetry-operations-symbols
   default-language: Haskell2010
