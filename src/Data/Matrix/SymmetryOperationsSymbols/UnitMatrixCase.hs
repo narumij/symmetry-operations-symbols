@@ -1,10 +1,10 @@
 {-|
-Module      : UnitMatrixCase
-Copyright   : (c) Jun Narumi, 2018
-License     : BSD-3
+Module      : Data.Matrix.SymmetryOperationsSymbols.UnitMatrixCase
+Description : Part of matrix reader (Translate and Identity)
+Copyright   : (c) Jun Narumi, 2018-2020
+License     : MIT
 Maintainer  : narumij@gmail.com
 Stability   : experimental
-Portability : ?
 
 [References]
 
@@ -22,7 +22,7 @@ module Data.Matrix.SymmetryOperationsSymbols.UnitMatrixCase (
 import Data.Ratio (Ratio)    
 import Data.Matrix
 import Data.Matrix.SymmetryOperationsSymbols.Common
-import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
+import Data.Matrix.SymmetryOperationsSymbols.SymopGeom
 
 -- | Case (i) The matrix W is the unit matrix:
 unitMatrixCase w

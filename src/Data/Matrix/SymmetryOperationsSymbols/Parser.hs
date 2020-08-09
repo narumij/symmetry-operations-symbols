@@ -1,12 +1,10 @@
 {-|
-Module      : Parse
-Description : pasing geometric representation part
+Module      : Data.Matrix.SymmetryOperationsSymbols.Parser
+Description : Parser of geometric representation
 Copyright   : (c) Jun Narumi, 2018
 License     : BSD-3
 Maintainer  : narumij@gmail.com
 Stability   : experimental
-Portability : ?
-
 -}
 module Data.Matrix.SymmetryOperationsSymbols.Parser (
   -- symbolSenseVectorOrientation,

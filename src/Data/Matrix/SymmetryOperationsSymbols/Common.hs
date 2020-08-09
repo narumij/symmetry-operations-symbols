@@ -1,20 +1,12 @@
 {-# LANGUAGE CPP #-}
 
 {-|
-Module      : Common
-Description : utilities
+Module      : Data.Matrix.SymmetryOperationsSymbols.Common
+Description : Utilities and Matrix table
 Copyright   : (c) Jun Narumi, 2018
-License     : BSD-3
+License     : MIT
 Maintainer  : narumij@gmail.com
 Stability   : experimental
-Portability : ?
-
-[Reference]
-
-W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
-
-listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
-
 -}
 module Data.Matrix.SymmetryOperationsSymbols.Common (
   ErrorMessage,
@@ -23,8 +15,8 @@ module Data.Matrix.SymmetryOperationsSymbols.Common (
   rotPart,
   transPart,
   iw,
-  triplet,
-  tripletParen,
+--  triplet,
+--  tripletParen,
   adjustAnswerOnAxis,
   axisOf,
   senseOf,
@@ -33,6 +25,10 @@ module Data.Matrix.SymmetryOperationsSymbols.Common (
   properMatrixW,
   hexagonalMatrixW,
   fromXYZ'',
+  MatrixForPointGroupCorrespondingSymmetryElement(..),
+  properMatricesForPointGroup,
+  hexagonalMatricesForPointGroup,
+  matricesForPointGroupCorrespondingSymmetryElements,
   ) where
 
 import Data.List
@@ -50,23 +46,6 @@ import Control.Monad.Fail (MonadFail)
 
 type ErrorMessage = String
 type SymbolSenseVectorOrientation = (Symbol,String,String,String)
-
--- | borrowed from Base ?.?.?
-maybeToEither :: a -> Maybe b -> Either a b
-maybeToEither _ (Just b) = Right b
-maybeToEither a  Nothing = Left a
-
--- |
--- >>> triplet (1%2,3%4,5%6)
--- "1/2,3/4,5/6"
-triplet :: Integral a => (Ratio a,Ratio a,Ratio a) -> String
-triplet (a,b,c) = intercalate "," . map (show . Slash) $ [a,b,c]
-
--- |
--- >>> triplet (1%2,3%4,5%6)
--- "(1/2,3/4,5/6)"
-tripletParen :: Integral a => (Ratio a,Ratio a,Ratio a) -> String
-tripletParen = ("(" ++) . (++ ")") . triplet
 
 -- | calculate (I-W)
 iw :: Num c => Matrix c -> Matrix c
@@ -166,21 +145,21 @@ lookupMatrixM reason dataTable (sy,se,_,el)
       Nothing -> fail reason
       Just c  -> return c
 
-properMatrixW = lookupMatrixM "matrix W not found (proper)." (fromTbl properTbl)
+properMatrixW = lookupMatrixM "matrix W not found (proper)." (fromTbl properMatricesForPointGroup)
 
-hexagonalMatrixW = lookupMatrixM "matrix W not found (hexagonal)." (fromTbl hexagonalTbl)
+hexagonalMatrixW = lookupMatrixM "matrix W not found (hexagonal)." (fromTbl hexagonalMatricesForPointGroup)
 
-fromTbl :: (Integral a) => [Tbl] -> [MatrixLookupRecord a]
+fromTbl :: (Integral a) => [Tbl a] -> [MatrixLookupRecord a]
 fromTbl = map tblToMLR
 
-tblToMLR :: (Integral a) => Tbl -> MatrixLookupRecord a
+tblToMLR :: (Integral a) => Tbl a -> MatrixLookupRecord a
 tblToMLR (a,s,b,c,d,e,f,g) = ((s,c,rotPart . fromXYZ'' $ d),f)
 
-properTbl :: [Tbl]
-properTbl = filter (not . isHex) tbl
+properMatricesForPointGroup :: Integral a => [Tbl a]
+properMatricesForPointGroup = filter (not . isHex) tbl
 
-hexagonalTbl :: [Tbl]
-hexagonalTbl = filter isHex tbl ++ filter (not . isHex) tbl
+hexagonalMatricesForPointGroup :: Integral a => [Tbl a]
+hexagonalMatricesForPointGroup = filter isHex tbl ++ filter (not . isHex) tbl
 
 primeSymbol :: Symbol -> Symbol
 primeSymbol T = Id
@@ -192,101 +171,126 @@ primeSymbol N = M
 primeSymbol G = M
 primeSymbol otherSymbol = otherSymbol
 
-data Lattice = Hexagonal | AnythingElse deriving (Eq)
+data TableType
+   = Hexagonal -- ^ for hexagonal and trigonal crystal systems.
+   | Others    -- ^ for cubic, tetragonal, orthorhombic, monoclinic and triclinic crystal systems.
+   deriving (Eq)
+
 type SymbolLabel = String
 type Sense = String
 type SymmetryElement = String
-type Orientation = [Integer] -- orientation or location
+type Orientation a = [a] -- orientation or location
 type TransformedCoordinate = String
-type AxisOrNormal = [Integer]
+type AxisOrNormal a = [a]
 
-type Tbl = (Lattice,Symbol,SymbolLabel,Sense,SymmetryElement,Orientation,TransformedCoordinate,AxisOrNormal)
+type Tbl a = MatrixForPointGroupCorrespondingSymmetryElement a
 
-tbl :: [Tbl]
-tbl = [
+type MatrixForPointGroupCorrespondingSymmetryElement a
+  = ( TableType, Symbol, SymbolLabel, Sense, SymmetryElement, Orientation a, TransformedCoordinate, AxisOrNormal a )
+
+tbl :: Integral a => [MatrixForPointGroupCorrespondingSymmetryElement a]
+tbl = matricesForPointGroupCorrespondingSymmetryElements
+
+-- | [Reference]
+--
+-- W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
+--
+-- listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
+--
 -- Table 11.2.2.1. Matrices for point-group symmetry operations and orientation
 -- of corresponding symmetry elements, referred to a cubic, tetragonal, orthorhombic,
 -- monoclinic, triclinic or rhombohedral coordinate system
-  ( AnythingElse,  Id,  "1",  "",        "",         [],     "x,y,z", []),
-  ( AnythingElse,  R2,  "2",  "",   "0,0,z", [ 0, 0, 1],   "-x,-y,z", []),
-  ( AnythingElse,  R2,  "2",  "",   "0,y,0", [ 0, 1, 0],   "-x,y,-z", []),
-  ( AnythingElse,  R2,  "2",  "",   "x,0,0", [ 1, 0, 0],   "x,-y,-z", []),
-  ( AnythingElse,  R3,  "3", "+",   "x,x,x", [ 1, 1, 1],     "z,x,y", []),
-  ( AnythingElse,  R3,  "3", "+", "x,-x,-x", [ 1,-1,-1],   "-z,-x,y", []),
-  ( AnythingElse,  R3,  "3", "+", "-x,x,-x", [-1, 1,-1],   "z,-x,-y", []),
-  ( AnythingElse,  R3,  "3", "+", "-x,-x,x", [-1,-1, 1],   "-z,x,-y", []),
-  ( AnythingElse,  R3,  "3", "-",   "x,x,x", [ 1, 1, 1],     "y,z,x", []),
-  ( AnythingElse,  R3,  "3", "-", "x,-x,-x", [ 1,-1,-1],   "-y,z,-x", []),
-  ( AnythingElse,  R3,  "3", "-", "-x,x,-x", [-1, 1,-1],   "-y,-z,x", []),
-  ( AnythingElse,  R3,  "3", "-", "-x,-x,x", [-1,-1, 1],   "y,-z,-x", []),
-  ( AnythingElse,  R2,  "2",  "",   "x,x,0", [ 1, 1, 0],    "y,x,-z", []),
-  ( AnythingElse,  R2,  "2",  "",   "x,0,x", [ 1, 0, 1],    "z,-y,x", []),
-  ( AnythingElse,  R2,  "2",  "",   "0,y,y", [ 0, 1, 1],    "-x,z,y", []),
-  ( AnythingElse,  R2,  "2",  "",  "x,-x,0", [ 1,-1, 0],  "-y,-x,-z", []),
-  ( AnythingElse,  R2,  "2",  "",  "-x,0,x", [-1, 0, 1],  "-z,-y,-x", []),
-  ( AnythingElse,  R2,  "2",  "",  "0,y,-y", [ 0, 1,-1],  "-x,-z,-y", []),
-  ( AnythingElse,  R4,  "4", "+",   "0,0,z", [ 0, 0, 1],    "-y,x,z", []),
-  ( AnythingElse,  R4,  "4", "+",   "0,y,0", [ 0, 1, 0],    "z,y,-x", []),
-  ( AnythingElse,  R4,  "4", "+",   "x,0,0", [ 1, 0, 0],    "x,-z,y", []),
-  ( AnythingElse,  R4,  "4", "-",   "0,0,z", [ 0, 0, 1],    "y,-x,z", []),
-  ( AnythingElse,  R4,  "4", "-",   "0,y,0", [ 0, 1, 0],    "-z,y,x", []),
-  ( AnythingElse,  R4,  "4", "-",   "x,0,0", [ 1, 0, 0],    "x,z,-y", []),
-----
-  ( AnythingElse, Inv, "-1",  "",   "0,0,0",         [],  "-x,-y,-z", []),
-  ( AnythingElse,   M,  "m",  "",   "x,y,0", [ 0, 0, 1],    "x,y,-z", []),
-  ( AnythingElse,   M,  "m",  "",   "x,0,z", [ 0, 1, 0],    "x,-y,z", []),
-  ( AnythingElse,   M,  "m",  "",   "0,y,z", [ 1, 0, 0],    "-x,y,z", []),
-  ( AnythingElse, RI3, "-3", "+",   "x,x,x", [ 1, 1, 1],  "-z,-x,-y", []),
-  ( AnythingElse, RI3, "-3", "+", "x,-x,-x", [ 1,-1,-1],    "z,x,-y", []),
-  ( AnythingElse, RI3, "-3", "+", "-x,x,-x", [-1, 1,-1],    "-z,x,y", []),
-  ( AnythingElse, RI3, "-3", "+", "-x,-x,x", [-1,-1, 1],    "z,-x,y", []),
-  ( AnythingElse, RI3, "-3", "-",   "x,x,x", [ 1, 1, 1],  "-y,-z,-x", []),
-  ( AnythingElse, RI3, "-3", "-", "x,-x,-x", [ 1,-1,-1],    "y,-z,x", []),
-  ( AnythingElse, RI3, "-3", "-", "-x,x,-x", [-1, 1,-1],    "y,z,-x", []),
-  ( AnythingElse, RI3, "-3", "-", "-x,-x,x", [-1,-1, 1],    "-y,z,x", []),
-  ( AnythingElse,   M,  "m",  "",  "x,-x,z", [ 1, 1, 0],   "-y,-x,z", []),
-  ( AnythingElse,   M,  "m",  "",  "-x,y,x", [ 1, 0, 1],   "-z,y,-x", []),
-  ( AnythingElse,   M,  "m",  "",  "x,y,-y", [ 0, 1, 1],   "x,-z,-y", []),
-  ( AnythingElse,   M,  "m",  "",   "x,x,z", [ 1,-1, 0],     "y,x,z", []),
-  ( AnythingElse,   M,  "m",  "",   "x,y,x", [-1, 0, 1],     "z,y,x", []),
-  ( AnythingElse,   M,  "m",  "",   "x,y,y", [ 0, 1,-1],     "x,z,y", []),
-  ( AnythingElse, RI4, "-4", "+",   "0,0,z", [ 0, 0, 1],   "y,-x,-z", []),
-  ( AnythingElse, RI4, "-4", "+",   "0,y,0", [ 0, 1, 0],   "-z,-y,x", []),
-  ( AnythingElse, RI4, "-4", "+",   "x,0,0", [ 1, 0, 0],   "-x,z,-y", []),
-  ( AnythingElse, RI4, "-4", "-",   "0,0,z", [ 0, 0, 1],   "-y,x,-z", []),
-  ( AnythingElse, RI4, "-4", "-",   "0,y,0", [ 0, 1, 0],   "z,-y,-x", []),
-  ( AnythingElse, RI4, "-4", "-",   "x,0,0", [ 1, 0, 0],   "-x,-z,y", []),
+--
 -- Table 11.2.2.2. Matrices for point-group symmetry operations and orientation
 -- of corresponding symmetry elements, referred to a hexagonal coordinate system
-  (    Hexagonal,  Id,  "1",  "",        "",         [],     "x,y,z", []),
-  (    Hexagonal,  R3,  "3", "+",   "0,0,z", [ 0, 0, 1],  "-y,x-y,z", []),
-  (    Hexagonal,  R3,  "3", "-",   "0,0,z", [ 0, 0, 1],  "y-x,-x,z", []),
-  (    Hexagonal,  R2,  "2",  "",   "0,0,z", [ 0, 0, 1],   "-x,-y,z", []),
-  (    Hexagonal,  R6,  "6", "+",   "0,0,z", [ 0, 0, 1],   "x-y,x,z", []),
-  (    Hexagonal,  R6,  "6", "-",   "0,0,z", [ 0, 0, 1],   "y,y-x,z", []),
-  (    Hexagonal,  R2,  "2",  "",   "x,x,0", [ 1, 1, 0],    "y,x,-z", []),
-  (    Hexagonal,  R2,  "2",  "",   "x,0,0", [ 1, 0, 0], "x-y,-y,-z", []),
-  (    Hexagonal,  R2,  "2",  "",   "0,y,0", [ 0, 1, 0], "-x,y-x,-z", []),
-  (    Hexagonal,  R2,  "2",  "",  "x,-x,0", [ 1,-1, 0],  "-y,-x,-z", []),
 --
-  (    Hexagonal,  R2,  "2",  "",  "x,2x,0", [ 1, 2, 0],  "y-x,y,-z", []),
-  (    Hexagonal,  R2,  "2",  "",  "2x,x,0", [ 2, 1, 0],  "x,x-y,-z", []),
+matricesForPointGroupCorrespondingSymmetryElements ::
+  Integral a => 
+  [MatrixForPointGroupCorrespondingSymmetryElement a]
+matricesForPointGroupCorrespondingSymmetryElements = [
+-- Table 11.2.2.1. Matrices for point-group symmetry operations and orientation
+-- of corresponding symmetry elements, referred to a cubic, tetragonal, orthorhombic,
+-- monoclinic, triclinic or rhombohedral coordinate system
+  (    Others,  Id,  "1",  "",        "",         [],     "x,y,z", []),
+  (    Others,  R2,  "2",  "",   "0,0,z", [ 0, 0, 1],   "-x,-y,z", []),
+  (    Others,  R2,  "2",  "",   "0,y,0", [ 0, 1, 0],   "-x,y,-z", []),
+  (    Others,  R2,  "2",  "",   "x,0,0", [ 1, 0, 0],   "x,-y,-z", []),
+  (    Others,  R3,  "3", "+",   "x,x,x", [ 1, 1, 1],     "z,x,y", []),
+  (    Others,  R3,  "3", "+", "x,-x,-x", [ 1,-1,-1],   "-z,-x,y", []),
+  (    Others,  R3,  "3", "+", "-x,x,-x", [-1, 1,-1],   "z,-x,-y", []),
+  (    Others,  R3,  "3", "+", "-x,-x,x", [-1,-1, 1],   "-z,x,-y", []),
+  (    Others,  R3,  "3", "-",   "x,x,x", [ 1, 1, 1],     "y,z,x", []),
+  (    Others,  R3,  "3", "-", "x,-x,-x", [ 1,-1,-1],   "-y,z,-x", []),
+  (    Others,  R3,  "3", "-", "-x,x,-x", [-1, 1,-1],   "-y,-z,x", []),
+  (    Others,  R3,  "3", "-", "-x,-x,x", [-1,-1, 1],   "y,-z,-x", []),
+  (    Others,  R2,  "2",  "",   "x,x,0", [ 1, 1, 0],    "y,x,-z", []),
+  (    Others,  R2,  "2",  "",   "x,0,x", [ 1, 0, 1],    "z,-y,x", []),
+  (    Others,  R2,  "2",  "",   "0,y,y", [ 0, 1, 1],    "-x,z,y", []),
+  (    Others,  R2,  "2",  "",  "x,-x,0", [ 1,-1, 0],  "-y,-x,-z", []),
+  (    Others,  R2,  "2",  "",  "-x,0,x", [-1, 0, 1],  "-z,-y,-x", []),
+  (    Others,  R2,  "2",  "",  "0,y,-y", [ 0, 1,-1],  "-x,-z,-y", []),
+  (    Others,  R4,  "4", "+",   "0,0,z", [ 0, 0, 1],    "-y,x,z", []),
+  (    Others,  R4,  "4", "+",   "0,y,0", [ 0, 1, 0],    "z,y,-x", []),
+  (    Others,  R4,  "4", "+",   "x,0,0", [ 1, 0, 0],    "x,-z,y", []),
+  (    Others,  R4,  "4", "-",   "0,0,z", [ 0, 0, 1],    "y,-x,z", []),
+  (    Others,  R4,  "4", "-",   "0,y,0", [ 0, 1, 0],    "-z,y,x", []),
+  (    Others,  R4,  "4", "-",   "x,0,0", [ 1, 0, 0],    "x,z,-y", []),
+----
+  (    Others, Inv, "-1",  "",   "0,0,0",         [],  "-x,-y,-z", []),
+  (    Others,   M,  "m",  "",   "x,y,0", [ 0, 0, 1],    "x,y,-z", []),
+  (    Others,   M,  "m",  "",   "x,0,z", [ 0, 1, 0],    "x,-y,z", []),
+  (    Others,   M,  "m",  "",   "0,y,z", [ 1, 0, 0],    "-x,y,z", []),
+  (    Others, RI3, "-3", "+",   "x,x,x", [ 1, 1, 1],  "-z,-x,-y", []),
+  (    Others, RI3, "-3", "+", "x,-x,-x", [ 1,-1,-1],    "z,x,-y", []),
+  (    Others, RI3, "-3", "+", "-x,x,-x", [-1, 1,-1],    "-z,x,y", []),
+  (    Others, RI3, "-3", "+", "-x,-x,x", [-1,-1, 1],    "z,-x,y", []),
+  (    Others, RI3, "-3", "-",   "x,x,x", [ 1, 1, 1],  "-y,-z,-x", []),
+  (    Others, RI3, "-3", "-", "x,-x,-x", [ 1,-1,-1],    "y,-z,x", []),
+  (    Others, RI3, "-3", "-", "-x,x,-x", [-1, 1,-1],    "y,z,-x", []),
+  (    Others, RI3, "-3", "-", "-x,-x,x", [-1,-1, 1],    "-y,z,x", []),
+  (    Others,   M,  "m",  "",  "x,-x,z", [ 1, 1, 0],   "-y,-x,z", []),
+  (    Others,   M,  "m",  "",  "-x,y,x", [ 1, 0, 1],   "-z,y,-x", []),
+  (    Others,   M,  "m",  "",  "x,y,-y", [ 0, 1, 1],   "x,-z,-y", []),
+  (    Others,   M,  "m",  "",   "x,x,z", [ 1,-1, 0],     "y,x,z", []),
+  (    Others,   M,  "m",  "",   "x,y,x", [-1, 0, 1],     "z,y,x", []),
+  (    Others,   M,  "m",  "",   "x,y,y", [ 0, 1,-1],     "x,z,y", []),
+  (    Others, RI4, "-4", "+",   "0,0,z", [ 0, 0, 1],   "y,-x,-z", []),
+  (    Others, RI4, "-4", "+",   "0,y,0", [ 0, 1, 0],   "-z,-y,x", []),
+  (    Others, RI4, "-4", "+",   "x,0,0", [ 1, 0, 0],   "-x,z,-y", []),
+  (    Others, RI4, "-4", "-",   "0,0,z", [ 0, 0, 1],   "-y,x,-z", []),
+  (    Others, RI4, "-4", "-",   "0,y,0", [ 0, 1, 0],   "z,-y,-x", []),
+  (    Others, RI4, "-4", "-",   "x,0,0", [ 1, 0, 0],   "-x,-z,y", []),
+-- Table 11.2.2.2. Matrices for point-group symmetry operations and orientation
+-- of corresponding symmetry elements, referred to a hexagonal coordinate system
+  ( Hexagonal,  Id,  "1",  "",        "",         [],     "x,y,z", []),
+  ( Hexagonal,  R3,  "3", "+",   "0,0,z", [ 0, 0, 1],  "-y,x-y,z", []),
+  ( Hexagonal,  R3,  "3", "-",   "0,0,z", [ 0, 0, 1],  "y-x,-x,z", []),
+  ( Hexagonal,  R2,  "2",  "",   "0,0,z", [ 0, 0, 1],   "-x,-y,z", []),
+  ( Hexagonal,  R6,  "6", "+",   "0,0,z", [ 0, 0, 1],   "x-y,x,z", []),
+  ( Hexagonal,  R6,  "6", "-",   "0,0,z", [ 0, 0, 1],   "y,y-x,z", []),
+  ( Hexagonal,  R2,  "2",  "",   "x,x,0", [ 1, 1, 0],    "y,x,-z", []),
+  ( Hexagonal,  R2,  "2",  "",   "x,0,0", [ 1, 0, 0], "x-y,-y,-z", []),
+  ( Hexagonal,  R2,  "2",  "",   "0,y,0", [ 0, 1, 0], "-x,y-x,-z", []),
+  ( Hexagonal,  R2,  "2",  "",  "x,-x,0", [ 1,-1, 0],  "-y,-x,-z", []),
+--
+  ( Hexagonal,  R2,  "2",  "",  "x,2x,0", [ 1, 2, 0],  "y-x,y,-z", []),
+  ( Hexagonal,  R2,  "2",  "",  "2x,x,0", [ 2, 1, 0],  "x,x-y,-z", []),
 -- 
-  (    Hexagonal, Inv, "-1",  "",   "0,0,0",         [],  "-x,-y,-z", []),
-  (    Hexagonal, RI3, "-3", "+",   "0,0,z", [ 0, 0, 1],  "y,y-x,-z", []),
-  (    Hexagonal, RI3, "-3", "-",   "0,0,z", [ 0, 0, 1],  "x-y,x,-z", []),
-  (    Hexagonal,   M,  "m",  "",   "x,y,0", [ 0, 0, 1],    "x,y,-z", []),
-  (    Hexagonal, RI6, "-6", "+",   "0,0,z", [ 0, 0, 1], "y-x,-x,-z", []),
-  (    Hexagonal, RI6, "-6", "-",   "0,0,z", [ 0, 0, 1], "-y,x-y,-z", []),
-  (    Hexagonal,   M,  "m",  "",  "x,-x,z", [ 1, 1, 0],   "-y,-x,z", []),
+  ( Hexagonal, Inv, "-1",  "",   "0,0,0",         [],  "-x,-y,-z", []),
+  ( Hexagonal, RI3, "-3", "+",   "0,0,z", [ 0, 0, 1],  "y,y-x,-z", []),
+  ( Hexagonal, RI3, "-3", "-",   "0,0,z", [ 0, 0, 1],  "x-y,x,-z", []),
+  ( Hexagonal,   M,  "m",  "",   "x,y,0", [ 0, 0, 1],    "x,y,-z", []),
+  ( Hexagonal, RI6, "-6", "+",   "0,0,z", [ 0, 0, 1], "y-x,-x,-z", []),
+  ( Hexagonal, RI6, "-6", "-",   "0,0,z", [ 0, 0, 1], "-y,x-y,-z", []),
+  ( Hexagonal,   M,  "m",  "",  "x,-x,z", [ 1, 1, 0],   "-y,-x,z", []),
 -- 以下二つが、Orientationを利用して解の補正をすることができなかったため、代替値を用意している
 -- 行列を解いた場合の解平面とorientationが一致していない可能性（2017の試行錯誤)
 -- そもそも勘違いの可能性もまだあるので、のちのち再確認する。
 -- hackageに登録するに至らない理由の一つ
 -- 正規化された値として正しいが、正規化の結果、復元に必要な情報が欠落してしまった可能性(2020リファクタリング時の見解)
 -- どうしてこうなっているのか、やっぱりわからない。
-  (    Hexagonal,   M,  "m",  "",  "x,2x,z", [ 1, 0, 0],   "y-x,y,z", [ 2,-1, 0]),
-  (    Hexagonal,   M,  "m",  "",  "2x,x,z", [ 0, 1, 0],   "x,x-y,z", [-1, 2, 0]),
+  ( Hexagonal,   M,  "m",  "",  "x,2x,z", [ 1, 0, 0],   "y-x,y,z", [ 2,-1, 0]),
+  ( Hexagonal,   M,  "m",  "",  "2x,x,z", [ 0, 1, 0],   "x,x-y,z", [-1, 2, 0]),
 
   (    Hexagonal,   M,  "m",  "",   "x,x,z", [ 1,-1, 0],     "y,x,z", []),
   (    Hexagonal,   M,  "m",  "",   "x,0,z", [ 1, 2, 0],  "x-y,-y,z", []),

@@ -19,17 +19,17 @@ Edit extra-deps part of stack.yaml like below.
 
 ```
 extra-deps:
-- matrix-as-xyz-0.1.1.3
-- symmetry-operations-symbols-0.0.1.4
+- matrix-as-xyz-0.1.2.1
+- symmetry-operations-symbols-0.0.2.0
 ```
 
 Edit dependencies part of package.yaml like below.
 
 ```
 dependencies:
-- base >= 4.7 && < 5
-- matrix-as-xyz
-- symmetry-operations-symbols
+- base >= 4.8 && < 5
+- matrix-as-xyz >= 0.1.2 && < 2
+- symmetry-operations-symbols >= 0.0 && < 0.1
 ```
 
 Then start repl.

@@ -1,12 +1,12 @@
 {-# LANGUAGE CPP #-}
 
 {-|
-Module      : GlideOrReflectionCase
-Copyright   : (c) Jun Narumi, 2018
-License     : BSD-3
+Module      : Data.Matrix.SymmetryOperationsSymbols.GlideOrReflectionCase
+Description : Part of matrix reader (Glide and Reflection)
+Copyright   : (c) Jun Narumi, 2018-2020
+License     : MIT
 Maintainer  : narumij@gmail.com
 Stability   : experimental
-Portability : ?
 
 [References]
 
@@ -27,21 +27,22 @@ import Data.Matrix hiding (transpose)
 import Data.Matrix.SymmetryOperationsSymbols.Solve
 import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
-import qualified Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation as S
+-- import qualified Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation as S
+import qualified Data.Matrix.SymmetryOperationsSymbols.SymopGeom as S
 
 #if MIN_VERSION_base(4,11,0)
-import Control.Monad.Fail (MonadFail)
+import Control.Monad.Fail (MonadFail(..))
 #endif
 
 -- | Case (ii) (c) W corresponds to a (glide) reflection
 #if MIN_VERSION_base(4,11,0)
-glideOrReflectionCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
+glideOrReflectionCase :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f (S.SymopGeom a)
 #else
-glideOrReflectionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (S.SymmetryOperation a)
+glideOrReflectionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (S.SymopGeom a)
 #endif
 glideOrReflectionCase m = arrange m <$> solvingEquation m
 
-arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> S.SymmetryOperation a
+arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> S.SymopGeom a
 arrange m ans
       | sym == M           = S.Reflection { S.plane = location }
       | sym `elem` [A,B,C] = S.GlideABC { S.abc = abc, S.plane = location }
@@ -55,7 +56,7 @@ arrange m ans
         dgn | sym == D = S.D
             | sym == G = S.G
             | sym == N = S.N
-        location = locationOf m <|> fromList 3 1 ans
+        location = toLists $ locationOf m <|> fromList 3 1 ans
 
         
 -- for repl check
@@ -85,9 +86,9 @@ solvingEquation'' :: Integral a => Matrix (Ratio a) -> Maybe [Ratio a]
 solvingEquation'' mat = adjustAnswerOnPlane mat . toList =<< solvingEquation' mat
 
 #if MIN_VERSION_base(4,11,0)
-solvingEquation :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+solvingEquation :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f [Ratio a]
 #else
-solvingEquation :: (Monad m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+solvingEquation :: (Integral a, Monad m) => Matrix (Ratio a) -> m [Ratio a]
 #endif
 solvingEquation mat = case solvingEquation'' mat of
   Nothing -> fail "<GlideOrReflection> when calculate equation solve."

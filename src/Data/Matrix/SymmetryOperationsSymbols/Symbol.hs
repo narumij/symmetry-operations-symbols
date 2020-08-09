@@ -1,8 +1,17 @@
+{-|
+Module      : Data.Matrix.SymmetryOperationsSymbols.Symbol
+Description : Symmetry Operation Symbols
+Copyright   : (c) Jun Narumi, 2018-2020
+License     : MIT
+Maintainer  : narumij@gmail.com
+Stability   : experimental
+-}
 module Data.Matrix.SymmetryOperationsSymbols.Symbol (
     Symbol(..)
   ) where
 
 import Control.Monad
+
 
 data Symbol
    = Id  --  '1'

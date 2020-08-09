@@ -1,9 +1,10 @@
 {-# LANGUAGE CPP #-}
 
 {-|
-Module      : RotationCase
-Copyright   : (c) Jun Narumi, 2018
-License     : BSD-3
+Module      : Data.Matrix.SymmetryOperationsSymbols.RotationCase
+Description : Part of matrix reader (Screw and Rotation)
+Copyright   : (c) Jun Narumi, 2018-2020
+License     : MIT
 Maintainer  : narumij@gmail.com
 Stability   : experimental
 Portability : ?
@@ -25,21 +26,22 @@ import Data.Matrix hiding (transpose)
 import Data.Matrix.SymmetryOperationsSymbols.Solve
 import Data.Matrix.SymmetryOperationsSymbols.Common
 import Data.Matrix.AsXYZ
-import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
+--import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
+import Data.Matrix.SymmetryOperationsSymbols.SymopGeom
 
 #if MIN_VERSION_base(4,11,0)
-import Control.Monad.Fail (MonadFail)
+import Control.Monad.Fail (MonadFail(..))
 #endif
 
 -- | Case (ii) (a) W corresponds to a rotoinversion
 #if MIN_VERSION_base(4,11,0)
-nFoldRotationCase :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+nFoldRotationCase :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f (SymopGeom a)
 #else
-nFoldRotationCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+nFoldRotationCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymopGeom a)
 #endif
 nFoldRotationCase m = arrange m <$> solvingEquation m
 
-arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> SymmetryOperation a
+arrange :: Integral a => Matrix (Ratio a) -> [Ratio a] -> SymopGeom a
 arrange m ans 
   | rt == 2 && noScrew = TwoFoldRotation { axis = location }
   | rt == 2            = TwoFoldScrew { axis = location, vector = (sa,sb,sc) }
@@ -58,7 +60,7 @@ arrange m ans
         s = if null . senseOf $ m then " " else senseOf m
         sym = " " ++ show rt ++ s
         screwPart@[sa,sb,sc] = toList (wg m)
-        location = locationOf m <|> fromList 3 1 ans
+        location = toLists $ locationOf m <|> fromList 3 1 ans
     
 --
 
@@ -107,7 +109,7 @@ solvingEquation'' mat = do
   adjustAnswerOnAxis mat (toList sol)
 
 #if MIN_VERSION_base(4,11,0)
-solvingEquation :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
+solvingEquation :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f [Ratio a]
 #else
 solvingEquation :: (Monad m, Integral a) => Matrix (Ratio a) -> m [Ratio a]
 #endif

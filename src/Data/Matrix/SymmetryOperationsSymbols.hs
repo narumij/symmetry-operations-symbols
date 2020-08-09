@@ -1,12 +1,12 @@
 {-# LANGUAGE FlexibleInstances, CPP #-}
 
 {-|
-Module      : SymmetryOperationsSymbols
-Copyright   : (c) Jun Narumi, 2018
-License     : BSD-3
+Module      : Data.Matrix.SymmetryOperationsSymbols
+Description : Read and Display Geometric representation of symmetry operation
+Copyright   : (c) Jun Narumi, 2018-2020
+License     : MIT
 Maintainer  : narumij@gmail.com
 Stability   : experimental
-Portability : ?
 
 Haskell Derivation of symbols and coordinate triplets Library
 
@@ -17,14 +17,16 @@ Haskell Derivation of symbols and coordinate triplets Library
 2. Wondratschek, H. & Neubu ̈ser, J. (1967). Determination of the symmetry elements of a space group from the ‘general positions’ listed in International Tables for X-ray Crystallography, Vol. I. Acta Cryst. 23, 349–352.
 
 -}
-
 module Data.Matrix.SymmetryOperationsSymbols (
   fromMatrix,
   fromMatrix',
+  readMatrix,
+  readMatrix',
   toMatrix,
   toMatrixHex,
   notHexagonal,
-  hexagonal
+  hexagonal,
+  liftError,
   ) where
 
 import Data.Ratio (Ratio)    
@@ -39,18 +41,17 @@ import Data.Matrix.SymmetryOperationsSymbols.RotationCase
 import Data.Matrix.SymmetryOperationsSymbols.RotInversionCase
 
 import Data.Matrix.SymmetryOperationsSymbols.Parser
-import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation -- (SymmetryOperation)
+import Data.Matrix.SymmetryOperationsSymbols.SymopGeom
 import Data.Matrix.SymmetryOperationsSymbols.Calc
 
+import Data.Matrix.SymmetryOperationsSymbols.PlainText
 
 -- for doctest
-import Data.Matrix.AsXYZ
+import Data.Matrix.AsXYZ (fromXYZ,prettyXYZ)
 
 #if MIN_VERSION_base(4,11,0)
-import Control.Monad.Fail (MonadFail)
-
+import Control.Monad.Fail (MonadFail(..))
 import qualified Control.Monad.Fail as Fail
-
 instance Fail.MonadFail (Either String) where
   fail = Left
 #endif
@@ -75,22 +76,27 @@ fromMatrix = fromMatrix'
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
 #if MIN_VERSION_base(4,11,0)
-fromMatrix' :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m String
+fromMatrix' :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f String
 #else
 fromMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m String
 #endif
-fromMatrix' m = showSymmetryOperation <$> fromMatrix'' m
+fromMatrix' m = showAsPlainText <$> readMatrix' m
+
+readMatrix :: Integral a =>
+              Matrix (Ratio a) -- ^ 3x4 or 4x4 Matrix
+           -> Maybe (SymopGeom a)
+readMatrix = readMatrix'
 
 -- | Derivation of geometric representation of symmetry operations from given matrix of symmetry operations
 --
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
 #if MIN_VERSION_base(4,11,0)
-fromMatrix'' :: (Monad m, MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+readMatrix' :: (MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymopGeom a)
 #else
-fromMatrix'' :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymmetryOperation a)
+readMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymopGeom a)
 #endif
-fromMatrix'' m
+readMatrix' m
   -- (i)
   | rotPart m == identity 3             = unitMatrixCase m
   -- (ii) (a)
@@ -100,12 +106,12 @@ fromMatrix'' m
   -- -- (ii) (c)
   | correpondToGlideOrReflection tr det = glideOrReflectionCase m
   -- --
-  | otherwise = fail "matrix is not symmetry operation."
+  | otherwise = fail $ "coordinate triplet '" ++ prettyXYZ m ++ "' is not symmetry operation."
   where
   tr  = trace (rotPart m)
   det = detLU (rotPart m)
 
-  -- | Derivation of matrix representation from a string of geometric representations of symmetric operations
+-- | Derivation of matrix representation from a string of geometric representations of symmetric operations
 -- for cubic, tetragonal, orthorhombic, monoclinic, triclinic or rhombohedral.
 --
 -- jpn) 対称操作の幾何的表現の文字列から行列表現の導出
@@ -130,3 +136,11 @@ toMatrixHex :: Integral a =>
                String -- ^ like " -1 0,0,0"
             -> Either ParseError (Matrix (Ratio a)) -- ^ 3x4 Matrix
 toMatrixHex st = parse hexagonal st st
+
+#if MIN_VERSION_base(4,11,0)
+liftError :: MonadFail m => Either ParseError a -> m a
+#else
+liftError :: Monad m => Either ParseError a -> m a
+#endif
+liftError (Left s) = fail ""
+liftError (Right m) = return m
