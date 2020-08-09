@@ -7,14 +7,6 @@ Copyright   : (c) Jun Narumi, 2018
 License     : MIT
 Maintainer  : narumij@gmail.com
 Stability   : experimental
-Portability : ?
-
-[Reference]
-
-W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
-
-listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
-
 -}
 module Data.Matrix.SymmetryOperationsSymbols.Common (
   ErrorMessage,
@@ -199,6 +191,19 @@ type MatrixForPointGroupCorrespondingSymmetryElement a
 tbl :: Integral a => [MatrixForPointGroupCorrespondingSymmetryElement a]
 tbl = matricesForPointGroupCorrespondingSymmetryElements
 
+-- | [Reference]
+--
+-- W. Fischer. and E. Koch. (2006), Derivation of symbols and coordinate triplets
+--
+-- listed in International Tables for Crystallography (2006). Vol. A, Chapter 11.2, pp. 812–816.
+--
+-- Table 11.2.2.1. Matrices for point-group symmetry operations and orientation
+-- of corresponding symmetry elements, referred to a cubic, tetragonal, orthorhombic,
+-- monoclinic, triclinic or rhombohedral coordinate system
+--
+-- Table 11.2.2.2. Matrices for point-group symmetry operations and orientation
+-- of corresponding symmetry elements, referred to a hexagonal coordinate system
+--
 matricesForPointGroupCorrespondingSymmetryElements ::
   Integral a => 
   [MatrixForPointGroupCorrespondingSymmetryElement a]
