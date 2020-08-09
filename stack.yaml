@@ -25,10 +25,10 @@
 #resolver: ghc-8.4.4
 #resolver: lts-12.26
 #resolver: ghc-8.6.5
-resolver: lts-14.27
+#resolver: lts-14.27
 #resolver: ghc-8.8.3
 #resolver: ghc-8.10.1
-#resolver: lts-16.8
+resolver: lts-16.8
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.

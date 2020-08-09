@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d3135bc01cd9eb7a0cdcabc4f6cea6184652351ab90dddc163a3909f97f36957
+-- hash: 5f2b0e4753d93beec7a429cb5e6b278905d59adf85897b9b854463435756f181
 
 name:           symmetry-operations-symbols
-version:        0.0.2.0
+version:        0.0.2.1
 synopsis:       Derivation of symbols and coordinate triplets Library
 description:    Please see the README on GitHub at <https://github.com/narumij/symmetry-operations-symbols#readme>
 category:       Chemistry
@@ -21,6 +21,7 @@ license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
+    ChangeLog.md
 
 source-repository head
   type: git
