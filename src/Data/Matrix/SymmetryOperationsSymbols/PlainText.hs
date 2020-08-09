@@ -1,3 +1,10 @@
+{-|
+Module      : Data.Matrix.SymmetryOperationsSymbols.PlainText
+Copyright   : (c) Jun Narumi, 2018-2020
+License     : MIT
+Maintainer  : narumij@gmail.com
+Stability   : experimental
+-}
 module Data.Matrix.SymmetryOperationsSymbols.PlainText (
   showAsPlainText,
 ) where

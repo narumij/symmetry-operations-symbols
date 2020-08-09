@@ -1,3 +1,10 @@
+{-|
+Module      : Data.Matrix.SymmetryOperationsSymbols.Calc
+Copyright   : (c) Jun Narumi, 2018-2020
+License     : MIT
+Maintainer  : narumij@gmail.com
+Stability   : experimental
+-}
 module Data.Matrix.SymmetryOperationsSymbols.Calc (
     deriveSymmetryOperation
     , correpondToRotInversion

@@ -1,9 +1,9 @@
 {-# LANGUAGE CPP #-}
 
 {-|
-Module      : RotationCase
-Copyright   : (c) Jun Narumi, 2018
-License     : BSD-3
+Module      : Data.Matrix.SymmetryOperationsSymbols.RotationCase
+Copyright   : (c) Jun Narumi, 2018-2020
+License     : MIT
 Maintainer  : narumij@gmail.com
 Stability   : experimental
 Portability : ?

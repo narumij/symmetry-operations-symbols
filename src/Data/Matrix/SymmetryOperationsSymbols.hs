@@ -1,12 +1,11 @@
 {-# LANGUAGE FlexibleInstances, CPP #-}
 
 {-|
-Module      : SymmetryOperationsSymbols
-Copyright   : (c) Jun Narumi, 2018
-License     : BSD-3
+Module      : Data.Matrix.SymmetryOperationsSymbols
+Copyright   : (c) Jun Narumi, 2018-2020
+License     : MIT
 Maintainer  : narumij@gmail.com
 Stability   : experimental
-Portability : ?
 
 Haskell Derivation of symbols and coordinate triplets Library
 
@@ -17,7 +16,6 @@ Haskell Derivation of symbols and coordinate triplets Library
 2. Wondratschek, H. & Neubu ̈ser, J. (1967). Determination of the symmetry elements of a space group from the ‘general positions’ listed in International Tables for X-ray Crystallography, Vol. I. Acta Cryst. 23, 349–352.
 
 -}
-
 module Data.Matrix.SymmetryOperationsSymbols (
   fromMatrix,
   fromMatrix',

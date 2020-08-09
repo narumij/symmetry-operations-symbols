@@ -1,3 +1,10 @@
+{-|
+Module      : Data.Matrix.SymmetryOperationsSymbols.SymopGeom
+Copyright   : (c) Jun Narumi, 2018-2020
+License     : MIT
+Maintainer  : narumij@gmail.com
+Stability   : experimental
+-}
 module Data.Matrix.SymmetryOperationsSymbols.SymopGeom where
 
 import Data.Ratio

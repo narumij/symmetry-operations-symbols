@@ -1,10 +1,10 @@
 {-# LANGUAGE CPP #-}
 
 {-|
-Module      : Common
+Module      : Data.Matrix.SymmetryOperationsSymbols.Common
 Description : utilities
 Copyright   : (c) Jun Narumi, 2018
-License     : BSD-3
+License     : MIT
 Maintainer  : narumij@gmail.com
 Stability   : experimental
 Portability : ?
@@ -181,7 +181,7 @@ primeSymbol otherSymbol = otherSymbol
 
 data TableType
    = Hexagonal -- ^ for hexagonal and trigonal crystal systems.
-   | Others -- ^ for cubic, tetragonal, orthorhombic, monoclinic and triclinic crystal systems.
+   | Others    -- ^ for cubic, tetragonal, orthorhombic, monoclinic and triclinic crystal systems.
    deriving (Eq)
 
 type SymbolLabel = String
