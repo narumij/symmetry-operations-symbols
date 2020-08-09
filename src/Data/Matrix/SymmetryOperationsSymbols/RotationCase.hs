@@ -29,12 +29,12 @@ import Data.Matrix.AsXYZ
 --import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
 import Data.Matrix.SymmetryOperationsSymbols.SymopGeom
 
-#if MIN_VERSION_base(4,11,0)
-import Control.Monad.Fail (MonadFail(..))
+#if MIN_VERSION_base(4,13,0)
+import Control.Monad.Fail (MonadFail)
 #endif
 
 -- | Case (ii) (a) W corresponds to a rotoinversion
-#if MIN_VERSION_base(4,11,0)
+#if MIN_VERSION_base(4,13,0)
 nFoldRotationCase :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f (SymopGeom a)
 #else
 nFoldRotationCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymopGeom a)
@@ -108,7 +108,7 @@ solvingEquation'' mat = do
   sol <- solvingEquation' mat
   adjustAnswerOnAxis mat (toList sol)
 
-#if MIN_VERSION_base(4,11,0)
+#if MIN_VERSION_base(4,13,0)
 solvingEquation :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f [Ratio a]
 #else
 solvingEquation :: (Monad m, Integral a) => Matrix (Ratio a) -> m [Ratio a]

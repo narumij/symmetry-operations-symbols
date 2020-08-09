@@ -19,8 +19,8 @@ Edit extra-deps part of stack.yaml like below.
 
 ```
 extra-deps:
-- matrix-as-xyz-0.1.2.1
-- symmetry-operations-symbols-0.0.2.0
+- matrix-as-xyz-0.1.2.2
+- symmetry-operations-symbols-0.0.2.1
 ```
 
 Edit dependencies part of package.yaml like below.

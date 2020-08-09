@@ -1,5 +1,4 @@
 {-# LANGUAGE FlexibleInstances, CPP #-}
-
 {-|
 Module      : Data.Matrix.SymmetryOperationsSymbols
 Description : Read and Display Geometric representation of symmetry operation
@@ -49,10 +48,9 @@ import Data.Matrix.SymmetryOperationsSymbols.PlainText
 -- for doctest
 import Data.Matrix.AsXYZ (fromXYZ,prettyXYZ)
 
-#if MIN_VERSION_base(4,11,0)
+#if MIN_VERSION_base(4,13,0)
 import Control.Monad.Fail (MonadFail(..))
-import qualified Control.Monad.Fail as Fail
-instance Fail.MonadFail (Either String) where
+instance MonadFail (Either String) where
   fail = Left
 #endif
 
@@ -75,7 +73,7 @@ fromMatrix = fromMatrix'
 --
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
-#if MIN_VERSION_base(4,11,0)
+#if MIN_VERSION_base(4,13,0)
 fromMatrix' :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f String
 #else
 fromMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m String
@@ -91,7 +89,7 @@ readMatrix = readMatrix'
 --
 -- jpn) 与えられた対称操作の行列から、対称操作の幾何的表現を導出
 --
-#if MIN_VERSION_base(4,11,0)
+#if MIN_VERSION_base(4,13,0)
 readMatrix' :: (MonadFail m, Integral a) => Matrix (Ratio a) -> m (SymopGeom a)
 #else
 readMatrix' :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymopGeom a)
@@ -137,7 +135,7 @@ toMatrixHex :: Integral a =>
             -> Either ParseError (Matrix (Ratio a)) -- ^ 3x4 Matrix
 toMatrixHex st = parse hexagonal st st
 
-#if MIN_VERSION_base(4,11,0)
+#if MIN_VERSION_base(4,13,0)
 liftError :: MonadFail m => Either ParseError a -> m a
 #else
 liftError :: Monad m => Either ParseError a -> m a
