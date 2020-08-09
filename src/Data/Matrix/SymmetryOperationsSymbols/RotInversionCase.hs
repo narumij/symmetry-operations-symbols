@@ -28,19 +28,19 @@ import Data.Matrix.AsXYZ
 --import Data.Matrix.SymmetryOperationsSymbols.SymmetryOperation
 import Data.Matrix.SymmetryOperationsSymbols.SymopGeom
 
-#if MIN_VERSION_base(4,11,0)
+#if MIN_VERSION_base(4,13,0)
 import Control.Monad.Fail (MonadFail(..))
 #endif
 
 -- | Case (ii) (b) W corresponds to an n-fold rotation
-#if MIN_VERSION_base(4,11,0)
+#if MIN_VERSION_base(4,13,0)
 rotInversionCase :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f (SymopGeom a)
 #else
 rotInversionCase :: (Monad m, Integral a) => Matrix (Ratio a) -> m (SymopGeom a)
 #endif
 rotInversionCase m = arrange m <$> calc m
 
-#if MIN_VERSION_base(4,11,0)
+#if MIN_VERSION_base(4,13,0)
 calc :: (MonadFail m, Integral a) => Matrix (Ratio a) -> m ([Ratio a], Matrix (Ratio a))
 #else
 calc :: (Monad m, Integral a) => Matrix (Ratio a) -> m ([Ratio a], Matrix (Ratio a))
@@ -88,7 +88,7 @@ wl :: (Fractional b, Eq b) => Matrix b -> Matrix b
 wl mat = elementwise (+) (wg mat) (transPart mat)
 
 -- (ii) (a) solving equation (W,w)x = x
-#if MIN_VERSION_base(4,11,0)
+#if MIN_VERSION_base(4,13,0)
 solvingEquation1 :: (MonadFail m, Integral a) => Matrix (Ratio a) -> m (Matrix (Ratio a))
 #else
 solvingEquation1 :: (Monad m, Integral a) => Matrix (Ratio a) -> m (Matrix (Ratio a))
@@ -107,7 +107,7 @@ solvingEquation2' mat = solve (iw w2) (wl mat)
     pow2 m = multStd m m
     w2 = pow2 (rotPart mat)
 
-#if MIN_VERSION_base(4,11,0)
+#if MIN_VERSION_base(4,13,0)
 solvingEquation2 :: (Integral a, MonadFail f) => Matrix (Ratio a) -> f [Ratio a]
 #else
 solvingEquation2 :: (Monad m, Integral a) => Matrix (Ratio a) -> m [Ratio a]

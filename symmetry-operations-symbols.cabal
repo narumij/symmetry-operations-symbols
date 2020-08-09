@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d049352960db9423c5cc3e872b002a336e32458f133a79ca2dca62268afed868
+-- hash: 3a17fff84d4327a218c081e41a3e67a500dedffe3bfaf8a6a1a37ed935d815a1
 
 name:           symmetry-operations-symbols
 version:        0.0.2.0
@@ -45,12 +45,11 @@ library
   hs-source-dirs:
       src
   build-depends:
-      QuickCheck
-    , base >=4.8 && <5
+      base >=4.8 && <5
     , doctest
     , hspec
     , matrix >=0.3.5 && <4
-    , matrix-as-xyz >=0.1.1 && <0.2
+    , matrix-as-xyz >=0.1 && <0.2
     , parsec >=3.1 && <4
   default-language: Haskell2010
 
@@ -61,12 +60,11 @@ test-suite doctest
       Paths_symmetry_operations_symbols
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      QuickCheck
-    , base >=4.8 && <5
+      base >=4.8 && <5
     , doctest
     , hspec
     , matrix >=0.3.5 && <4
-    , matrix-as-xyz >=0.1.1 && <0.2
+    , matrix-as-xyz >=0.1 && <0.2
     , parsec >=3.1 && <4
     , symmetry-operations-symbols
   default-language: Haskell2010
@@ -85,12 +83,11 @@ test-suite spec-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      QuickCheck
-    , base >=4.8 && <5
+      base >=4.8 && <5
     , doctest
     , hspec
     , matrix >=0.3.5 && <4
-    , matrix-as-xyz >=0.1.1 && <0.2
+    , matrix-as-xyz >=0.1 && <0.2
     , parsec >=3.1 && <4
     , symmetry-operations-symbols
   default-language: Haskell2010
