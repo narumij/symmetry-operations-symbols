@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP #-}
 {-|
 Module      : Data.Matrix.SymmetryOperationsSymbols.RotInversionCase
+Description : Part of matrix reader (Inversion)
 Copyright   : (c) Jun Narumi, 2018-2020
 License     : MIT
 Maintainer  : narumij@gmail.com

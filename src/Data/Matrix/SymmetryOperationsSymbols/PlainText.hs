@@ -1,5 +1,6 @@
 {-|
 Module      : Data.Matrix.SymmetryOperationsSymbols.PlainText
+Description : Output as plain text
 Copyright   : (c) Jun Narumi, 2018-2020
 License     : MIT
 Maintainer  : narumij@gmail.com

@@ -1,6 +1,6 @@
 {-|
 Module      : Data.Matrix.SymmetryOperationsSymbols.Solve
-Description : solving linear equation part
+Description : Solving linear equation part
 Copyright   : (c) Jun Narumi, 2018-2020
 License     : MIT
 Maintainer  : narumij@gmail.com

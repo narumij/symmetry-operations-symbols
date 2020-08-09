@@ -1,5 +1,6 @@
 {-|
 Module      : Data.Matrix.SymmetryOperationsSymbols.UnitMatrixCase
+Description : Part of matrix reader (Translate and Identity)
 Copyright   : (c) Jun Narumi, 2018-2020
 License     : MIT
 Maintainer  : narumij@gmail.com

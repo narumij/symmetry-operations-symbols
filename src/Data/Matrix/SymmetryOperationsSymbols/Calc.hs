@@ -1,5 +1,6 @@
 {-|
 Module      : Data.Matrix.SymmetryOperationsSymbols.Calc
+Description : Translate SymopGeom to matrix
 Copyright   : (c) Jun Narumi, 2018-2020
 License     : MIT
 Maintainer  : narumij@gmail.com

@@ -1,5 +1,6 @@
 {-|
 Module      : Data.Matrix.SymmetryOperationsSymbols.SymopGeom
+Description : Type of geometric representation
 Copyright   : (c) Jun Narumi, 2018-2020
 License     : MIT
 Maintainer  : narumij@gmail.com

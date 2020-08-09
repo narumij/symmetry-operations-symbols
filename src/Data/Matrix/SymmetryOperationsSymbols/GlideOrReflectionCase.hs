@@ -2,6 +2,7 @@
 
 {-|
 Module      : Data.Matrix.SymmetryOperationsSymbols.GlideOrReflectionCase
+Description : Part of matrix reader (Glide and Reflection)
 Copyright   : (c) Jun Narumi, 2018-2020
 License     : MIT
 Maintainer  : narumij@gmail.com

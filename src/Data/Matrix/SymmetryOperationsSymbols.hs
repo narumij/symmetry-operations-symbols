@@ -2,6 +2,7 @@
 
 {-|
 Module      : Data.Matrix.SymmetryOperationsSymbols
+Description : Read and Display Geometric representation of symmetry operation
 Copyright   : (c) Jun Narumi, 2018-2020
 License     : MIT
 Maintainer  : narumij@gmail.com

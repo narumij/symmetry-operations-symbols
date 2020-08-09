@@ -2,7 +2,7 @@
 
 {-|
 Module      : Data.Matrix.SymmetryOperationsSymbols.Common
-Description : utilities
+Description : Utilities and Matrix table
 Copyright   : (c) Jun Narumi, 2018
 License     : MIT
 Maintainer  : narumij@gmail.com

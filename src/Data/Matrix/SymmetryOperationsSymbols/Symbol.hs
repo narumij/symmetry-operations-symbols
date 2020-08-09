@@ -1,5 +1,6 @@
 {-|
 Module      : Data.Matrix.SymmetryOperationsSymbols.Symbol
+Description : Symmetry Operation Symbols
 Copyright   : (c) Jun Narumi, 2018-2020
 License     : MIT
 Maintainer  : narumij@gmail.com

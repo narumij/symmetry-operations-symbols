@@ -1,6 +1,6 @@
 {-|
 Module      : Data.Matrix.SymmetryOperationsSymbols.Parser
-Description : pasing geometric representation part
+Description : Parser of geometric representation
 Copyright   : (c) Jun Narumi, 2018
 License     : BSD-3
 Maintainer  : narumij@gmail.com
