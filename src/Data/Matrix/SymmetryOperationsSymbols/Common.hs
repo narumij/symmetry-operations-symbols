@@ -285,7 +285,7 @@ matricesForPointGroupCorrespondingSymmetryElements = [
   ( Hexagonal,   M,  "m",  "",  "x,-x,z", [ 1, 1, 0],   "-y,-x,z", []),
 -- 以下二つは、六方基底なので、orientationを真に受けると、
 -- 行列を解いた場合の解平面とorientationが一致しない
--- このため代替値を用意している
+-- このため法線に代替値を用意している
   ( Hexagonal,   M,  "m",  "",  "x,2x,z", [ 1, 0, 0],   "y-x,y,z", [ 2,-1, 0]),
   ( Hexagonal,   M,  "m",  "",  "2x,x,z", [ 0, 1, 0],   "x,x-y,z", [-1, 2, 0]),
 
